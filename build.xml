@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- ====================================================================== 
+     30. June, 2016 15:59:06                                                        
+
+     TerrainGen                                                                
+     ====================================================================== -->
+<project name="project" default="default">
+	<property name="version" value="0.0.1"/>
+	
+    <description>
+            See README.md
+    </description>
+
+    <!-- ================================= 
+          target: default              
+         ================================= -->
+    <target name="default" depends="depends" description="description">
+    	<javac srcdir="src"
+         destdir="bin"
+         classpath="lib/*"
+         debug="on"
+		/>
+    </target>
+
+    <!-- - - - - - - - - - - - - - - - - - 
+          target: depends                      
+         - - - - - - - - - - - - - - - - - -->
+    <target name="depends">
+    </target>
+
+	<!-- ================================= 
+          target: release-nightly          
+         ================================= -->
+    <target name="release-nightly" depends="default" description="description">
+    	<tstamp />
+        <jar destfile="release/terraingen-nightly-{DSTAMP}.jar"></jar>
+    </target>
+</project>
