@@ -3,7 +3,6 @@ package terraingen.frontend.init;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.json.JSONObject;
-
 import terraingen.utils.IterableWrapper;
 
 /**
@@ -14,14 +13,14 @@ import terraingen.utils.IterableWrapper;
  * Configuration files are loaded block by block, i.e., by considering every
  * children of the root of {@code conf.getRoot()}. A standard block should look
  * like this:
- * 
+ * <p>
  * <code><pre>
  * "ui": {
  *     "style": "windows",
  *     "location": "center",
  * }
  * </pre></code>
- * 
+ * <p>
  * And class {@code terraingen.frontend.init.InitUI.init()} is called with the
  * object passed, while the UI subsystem initializes itself in the meantime. <br />
  * Other blocks work in the same way. The initializer looks for corresponding
@@ -31,8 +30,8 @@ import terraingen.utils.IterableWrapper;
  * {@link terraingen.frontend.init.Initializers Initializers}
  */
 public class Initialization {
-	private static Log		log			= LogFactory.getLog(Initialization.class);
-	public static boolean	initialized	= false;
+	private static Log log = LogFactory.getLog(Initialization.class);
+	public static boolean initialized = false;
 
 	/**
 	 * A program should use only ONE initialization configuration file, so this
@@ -50,5 +49,9 @@ public class Initialization {
 						log.error("Initialization of block \"" + key + "\" failed.", e);
 					}
 				}
+	}
+
+	private static void unused() {
+		System.out.println("This method is unused!");
 	}
 }

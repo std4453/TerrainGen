@@ -9,21 +9,13 @@ import org.apache.commons.logging.LogFactory;
 /**
  * Loaded Initializers:<br />
  * <table>
- * <tr>
- * <td>Name</td>
- * <td>Class</td>
- * <td>Description</td>
- * </tr>
- * <tr>
- * <td>ui</td>
- * <td>{@link terraingen.frontend.init.InitUI InitUI}</td>
- * <td>User interface module</td>
- * </tr>
+ * <tr><td>Name</td><td>Class</td><td>Description</td></tr>
+ * <tr><td>ui</td><td>{@link terraingen.frontend.init.InitUI InitUI}</td><td>User interface module</td></tr>
  * </table>
  */
 public class Initializers {
-	private static Log							log			= LogFactory.getLog(Initializers.class);
-	private static Map<String, IInitializer>	registry	= new HashMap<>();
+	private static Log log = LogFactory.getLog(Initializers.class);
+	private static Map<String, IInitializer> registry = new HashMap<>();
 
 	static {
 		register("ui", new InitUI());
