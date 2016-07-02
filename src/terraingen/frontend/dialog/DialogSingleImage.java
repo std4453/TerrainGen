@@ -2,13 +2,11 @@ package terraingen.frontend.dialog;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import terraingen.utils.ImageUtils;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 
 /** A simple dialog that displays an image using a {@code BufferedImage} */
 public class DialogSingleImage implements IDialog {
@@ -18,33 +16,39 @@ public class DialogSingleImage implements IDialog {
 	/** Just there to get rid of magic numbers */
 	private static int IMAGE_MARGIN = 30;
 
-	protected JFrame frame;
-	protected JLabel imageLabel;
+	protected JFrame createFrame() {
+		JFrame frame = new JFrame();
+		frame.setTitle("Image");
+		frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+		frame.setResizable(false);
 
-	protected DialogSingleImage() {
-		this.frame = new JFrame();
-		this.frame.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-		this.frame.setResizable(false);
+		return frame;
+	}
+
+	/** Add the image label to the frame */
+	protected JLabel populateFrame(JFrame frame, ImageIcon icon) {
 		JPanel panel = new JPanel();
-		this.frame.setContentPane(panel);
+		frame.setContentPane(panel);
 		panel.setLayout(new BorderLayout());
-		this.imageLabel = new JLabel("");
-		this.imageLabel.setBorder(
+		JLabel label = new JLabel(icon);
+		label.setBorder(
 				new EmptyBorder(IMAGE_MARGIN, IMAGE_MARGIN, IMAGE_MARGIN, IMAGE_MARGIN));
-		panel.add(this.imageLabel, BorderLayout.CENTER);
+		panel.add(label);
+
+		return label;
 	}
 
 	/**
 	 * Places the frame in the middle of the screen.<br />
 	 * ( screen size obtained using {@code Toolkit.getDefaultToolkit().getScreenSize()} )
 	 */
-	protected void placeFrame() {
-		this.frame.pack();
-		Dimension size = this.frame.getSize();
+	protected void placeFrame(JFrame frame) {
+		frame.pack();
+		Dimension size = frame.getSize();
 		Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
 		double x = screenSize.getWidth() / 2 - size.getWidth() / 2;
 		double y = screenSize.getHeight() / 2 - size.getHeight() / 2;
-		this.frame.setLocation((int) x, (int) y);
+		frame.setLocation((int) x, (int) y);
 	}
 
 	@Override
@@ -55,18 +59,12 @@ public class DialogSingleImage implements IDialog {
 		}
 		BufferedImage image = ((BufferedImage) obj);
 		ImageIcon icon = new ImageIcon(image);
-		this.imageLabel.setIcon(icon);
-		placeFrame();
-		this.frame.setVisible(true);
-		DialogUtils.waitUntilFrameIsClosed(this.frame);
+		JFrame frame = createFrame();
+		JLabel imageLabel = populateFrame(frame, icon);
+		placeFrame(frame);
+		frame.setVisible(true);
+		DialogUtils.waitUntilFrameIsClosed(frame);
 
 		return null;
-	}
-
-	public static void main(String[] args) throws IOException {
-		DialogSingleImage dialog = DialogSingleImage.instance;
-		BufferedImage image = ImageUtils.readInternalImage("/assets/images/test/image1" +
-				".jpg");
-		dialog.show(image);
 	}
 }
