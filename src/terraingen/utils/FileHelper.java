@@ -1,18 +1,22 @@
 package terraingen.utils;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
 public class FileHelper {
-	private static Log	log	= LogFactory.getLog(FileHelper.class);
+	private static Log log = LogFactory.getLog(FileHelper.class);
+
+	public static boolean isReadableFile(File file) {
+		return file != null && file.isFile() && file.exists() && file.canRead();
+	}
 
 	public static String readFile(File file) throws IOException {
-		if (file == null || file.isDirectory())
-			throw new IOException("File unavailable!");
+		if (!isReadableFile(file))
+			throw new IOException("File unavailable.");
 		StringBuilder sb = new StringBuilder();
 		FileInputStream fis = new FileInputStream(file);
 		while (fis.available() > 0)
