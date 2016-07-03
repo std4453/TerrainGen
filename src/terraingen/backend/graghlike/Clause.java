@@ -109,7 +109,7 @@ public class Clause<I, O> extends Statement<I, O> {
 		boolean statementReady = true;
 		List<IInput<?>> inputList = statement.getInputs();
 		for (IInput<?> input : inputList)
-			if (input.getOutEdge() != null && input.getOutEdge().isValueSet()) {
+			if (input.getOutEdge() == null || !input.getOutEdge().isValueSet()) {
 				statementReady = false;
 				break;
 			}
@@ -121,12 +121,12 @@ public class Clause<I, O> extends Statement<I, O> {
 	public void execute() {
 		super.execute();
 
+		// pre-execution
+		clear();
+
 		// copy input value
 		I input = this.input.getOutEdge().getValue();
 		this.headHalfEdge.setValue(input);
-
-		// pre-execution
-		clear();
 
 		// execute using BFS
 		Queue<Statement> queue = new ArrayDeque<>();
@@ -136,7 +136,6 @@ public class Clause<I, O> extends Statement<I, O> {
 		Statement statement;
 		while (!queue.isEmpty()) {
 			statement = queue.poll();
-			System.out.println(statement.getClass().getName());
 
 			// check whether the statement is ready for execution
 			if (statement == null) {

@@ -79,6 +79,6 @@ public class ClauseTest1 {
 
 		// calculate!
 		Integer ans = Executor.execute(clause, new Integer[]{1, 2, 3});
-		System.out.println(ans);
+		System.out.println(ans);  // should be 9
 	}
 }
