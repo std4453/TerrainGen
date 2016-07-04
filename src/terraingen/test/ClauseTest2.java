@@ -45,7 +45,8 @@ public class ClauseTest2 {
 		new Edge<>(s2.getOutput(1), s4.getInput2());
 		new Edge<>(s3.getOutput(), s4.getInput1());
 
-		Clause<Integer[], Integer> clause = new Clause<>(s1.getInput(), s4.getOutput());
+		Statement<Integer[], Integer> clause = new Statement<>(s1.getInput(),
+				s4.getOutput());
 
 		Integer ans = Executor.execute(clause, new Integer[]{2, 3});
 		System.out.println(ans);   // should be 24

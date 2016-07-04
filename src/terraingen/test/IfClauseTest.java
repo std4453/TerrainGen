@@ -29,9 +29,9 @@ public class IfClauseTest {
 					}
 				});
 		IfClause<Integer, String> ifClause = new IfClause<>(
-				new Clause<>(conditioner.getInput(), conditioner.getOutput()),
-				new Clause<>(route1.getInput(), route1.getOutput()),
-				new Clause<>(route2.getInput(), route2.getOutput()));
+				new Statement<>(conditioner.getInput(), conditioner.getOutput()),
+				new Statement<>(route1.getInput(), route1.getOutput()),
+				new Statement<>(route2.getInput(), route2.getOutput()));
 		for (int i = 1; i <= 10; ++i) {
 			System.out.println(String.format("Input number %d:", i));
 			String output = Executor.execute(ifClause, i);

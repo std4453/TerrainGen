@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Node that have single / multiple head and tail, class set to abstract that
+ * Node that have single / multiple input and output, class set to abstract that
  * it cannot be instantiated.
  */
 public abstract class Node<I, O> {
@@ -41,7 +41,7 @@ public abstract class Node<I, O> {
 	 * <br />
 	 * Note that this method is not exception-free, any kind of exception can be thrown
 	 * because of wrong usage of the whole model, like: unassigned edge, edgeless
-	 * head / tail, algorithm error, wrong head etc.. Anyone who works on it should
+	 * input / output, algorithm error, wrong input etc.. Anyone who works on it should
 	 * be aware of what would happen while calling this method, thus making it
 	 * exception-free with his / her own brain.
 	 */

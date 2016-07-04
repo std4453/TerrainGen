@@ -9,22 +9,22 @@ import java.util.List;
 import java.util.Queue;
 
 /**
- * A clause contains many {@link Node}s and execute them.<br />
+ * A statement contains many {@link Node}s and execute them.<br />
  * One execution process should follow the following rules:<br />
  * <ol>
  * <li>One node can be executed only once</li>
  * <li>One node is executed only after every {@link Node} that serves as its
- * predecessor ( head ) is successfully executed</li>
+ * predecessor ( input ) is successfully executed</li>
  * <li>There is only one input and one output ( while multiple input & output can be
  * achieved using arrays or other collections )</li>
- * <li>No loop should be formed in a clause ( Loops are achieved using
+ * <li>No loop should be formed in a statement ( Loops are achieved using
  * {@link LoopStatement} )</li>
  * </ol>
- * Therefore anyone who makes a structure with {@code Clause} should be aware of these
+ * Therefore anyone who makes a structure with {@code Statement} should be aware of these
  * rules, while no further check is done while the structure is being built.
  */
-public class Clause<I, O> extends Node<I, O> implements IProcessorLike<I, O> {
-	private static Log log = LogFactory.getLog(Clause.class);
+public class Statement<I, O> extends Node<I, O> implements IProcessorLike<I, O> {
+	private static Log log = LogFactory.getLog(Statement.class);
 
 	protected IInput<I> input;
 	protected IOutput<O> output;
@@ -38,7 +38,7 @@ public class Clause<I, O> extends Node<I, O> implements IProcessorLike<I, O> {
 	protected List<Edge> edges;
 	protected List<Node> nodes;
 
-	public Clause(IInput<I> contentInput, IOutput<O> contentOutput) {
+	public Statement(IInput<I> contentInput, IOutput<O> contentOutput) {
 		// input & output for external access
 		this.input = new IInput<>(this);
 		this.output = new IOutput<>(this);
@@ -61,11 +61,11 @@ public class Clause<I, O> extends Node<I, O> implements IProcessorLike<I, O> {
 		buildCaches();
 	}
 
-	public Clause(IOutput<O> contentOutput, IInput<I> contentInput) {
+	public Statement(IOutput<O> contentOutput, IInput<I> contentInput) {
 		this(contentInput, contentOutput);
 	}
 
-	public Clause(IProcessorLike<I, O> statement) {
+	public Statement(IProcessorLike<I, O> statement) {
 		this(statement.getInput(), statement.getOutput());
 	}
 
@@ -97,7 +97,7 @@ public class Clause<I, O> extends Node<I, O> implements IProcessorLike<I, O> {
 	}
 	
 	/**
-	 * Calls {@code clearValue()} of every edge of nodes in this clause and
+	 * Calls {@code clearValue()} of every edge of nodes in this statement and
 	 * {@code clearExecuted()} of every statement ( except for {@code this.head} &
 	 * {@code this.tail} )
 	 */
@@ -109,7 +109,7 @@ public class Clause<I, O> extends Node<I, O> implements IProcessorLike<I, O> {
 	}
 
 	/**
-	 * Is every head of this node provided with data?
+	 * Is every input of this node provided with data?
 	 *
 	 * @param node
 	 * 		The node to check

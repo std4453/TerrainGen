@@ -1,7 +1,7 @@
 package terraingen.backend.nodegraph;
 
 /**
- * head: v, tail: v
+ * input: v, output: v
  */
 public class BlankNode<V> extends Node<V, V> {
 	protected IInput<V> input;

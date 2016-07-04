@@ -75,7 +75,8 @@ public class ClauseTest1 {
 		new Edge<>(s2.getOutput(), s7.getInput1());
 
 		// create clause
-		Clause<Integer[], Integer> clause = new Clause<>(s1.getInput(), s7.getOutput());
+		Statement<Integer[], Integer> clause = new Statement<>(s1.getInput(),
+				s7.getOutput());
 
 		// calculate!
 		Integer ans = Executor.execute(clause, new Integer[]{1, 2, 3});
