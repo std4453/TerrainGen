@@ -23,7 +23,7 @@ import java.util.Queue;
  * Therefore anyone who makes a structure with {@code Statement} should be aware of these
  * rules, while no further check is done while the structure is being built.
  */
-public class Statement<I, O> extends Node<I, O> implements IProcessorLike<I, O> {
+public class Statement<I, O> extends Node<I, O> {
 	private static Log log = LogFactory.getLog(Statement.class);
 
 	protected InputPort<I> input;
@@ -190,12 +190,10 @@ public class Statement<I, O> extends Node<I, O> implements IProcessorLike<I, O> 
 		this.output.getInEdge().setValue(output);
 	}
 
-	@Override
 	public InputPort<I> getInput() {
 		return this.input;
 	}
 
-	@Override
 	public OutputPort<O> getOutput() {
 		return this.output;
 	}

@@ -35,27 +35,20 @@ public class Executor {
 	}
 
 	/**
-	 * This method is not recommended to use, as it wraps the given {@link Node}
-	 * with a {@link Statement} whose reference is not returned. If further modification
-	 * occurs on the {@link Node}, errors may occur, therefore this method should
-	 * be called with a {@link Node} as input only when the {@link Node}
-	 * wouldn't be changed in any case.<br />
-	 * ( Theoretically interface {@link IProcessorLike} should be implemented by an
-	 * subclass of {@link Node}, though there is no technical way to ensure this )
+	 * Executes the given node using constructor {@link Statement}{@code (Node)}.<br />
+	 * Using this method may be risky, you should make sure the node has exactly one
+	 * input and output port, or an exception may be thrown.
 	 *
 	 * @param node
-	 * 		The {@link Node} to execute
 	 * @param input
-	 * 		Input to the {@link Node}
 	 * @param <I>
 	 * 		Input class
 	 * @param <O>
 	 * 		Output class
 	 *
-	 * @return Execution result of the {@link Node}.
+	 * @return Result of execution
 	 */
-	public static <I, O> O execute(IProcessorLike<I, O> node, I input) {
-		Statement<I, O> statement = new Statement<>(node);
-		return execute(statement, input);
+	public static <I, O> O execute(Node<I, O> node, I input) {
+		return execute(new Statement<>(node), input);
 	}
 }

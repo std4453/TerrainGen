@@ -11,7 +11,7 @@ import java.util.Map;
  * the input to a key, which is used to determine which route ( {@link Statement} ) is
  * executed.
  */
-public class SwitchClause<K, I, O> extends Node<I, O> implements IProcessorLike<I, O> {
+public class SwitchClause<K, I, O> extends Node<I, O> {
 	private static Log log = LogFactory.getLog(SwitchClause.class);
 
 	protected Statement<I, K> mapper;
@@ -45,12 +45,10 @@ public class SwitchClause<K, I, O> extends Node<I, O> implements IProcessorLike<
 		this.output = new OutputPort<>(this);
 	}
 
-	@Override
 	public InputPort<I> getInput() {
 		return this.input;
 	}
 
-	@Override
 	public OutputPort<O> getOutput() {
 		return this.output;
 	}
