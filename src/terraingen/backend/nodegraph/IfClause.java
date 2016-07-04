@@ -1,4 +1,4 @@
-package terraingen.backend.graghlike;
+package terraingen.backend.nodegraph;
 
 /**
  * {@code IfClause} selects between 2 routes according to what an conditioner clause

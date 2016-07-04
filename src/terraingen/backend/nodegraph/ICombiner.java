@@ -1,4 +1,4 @@
-package terraingen.backend.graghlike;
+package terraingen.backend.nodegraph;
 
 /**
  * Combines head of class I to an tail of class O

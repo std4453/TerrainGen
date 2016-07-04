@@ -1,4 +1,4 @@
-package terraingen.backend.graghlike;
+package terraingen.backend.nodegraph;
 
 /**
  * Supplies tail of class O

@@ -1,6 +1,6 @@
 package terraingen.test;
 
-import terraingen.backend.graghlike.*;
+import terraingen.backend.nodegraph.*;
 
 /**
  *

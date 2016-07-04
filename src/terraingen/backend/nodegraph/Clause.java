@@ -1,4 +1,4 @@
-package terraingen.backend.graghlike;
+package terraingen.backend.nodegraph;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

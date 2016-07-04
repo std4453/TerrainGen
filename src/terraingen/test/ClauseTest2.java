@@ -1,6 +1,6 @@
 package terraingen.test;
 
-import terraingen.backend.graghlike.*;
+import terraingen.backend.nodegraph.*;
 
 import java.util.Arrays;
 import java.util.List;
