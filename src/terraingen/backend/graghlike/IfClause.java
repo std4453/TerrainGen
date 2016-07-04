@@ -6,7 +6,7 @@ package terraingen.backend.graghlike;
  * an boolean value, while {@code true} means the first route ( {@code route1}: if-then
  * ), and false the second one ( {@code route2}: if-else )
  */
-public class IfClause<I, O> extends Statement<I, O> {
+public class IfClause<I, O> extends Statement<I, O> implements IProcessorLike<I, O> {
 	protected Clause<I, Boolean> conditioner;
 	protected Clause<I, O> route1;
 	protected Clause<I, O> route2;
@@ -43,10 +43,12 @@ public class IfClause<I, O> extends Statement<I, O> {
 		this.outputCollection.add(this.output);
 	}
 
+	@Override
 	public IInput<I> getInput() {
 		return this.input;
 	}
 
+	@Override
 	public IOutput<O> getOutput() {
 		return this.output;
 	}
@@ -56,15 +58,9 @@ public class IfClause<I, O> extends Statement<I, O> {
 		super.execute();
 
 		I input = this.input.getOutEdge().getValue();
-
-		this.conditionerHead.setValue(input);
-		this.conditioner.execute();
-		Boolean ans = this.conditionerTail.getValue();
-
-		Clause<I, O> route = ans ? route1 : route2;
-		route.getInput().getOutEdge().setValue(input);
-		route.execute();
-		O output = route.getOutput().getInEdge().getValue();
+		Boolean choice = Executor.execute(this.conditioner, input);
+		Clause<I, O> route = choice ? this.route1 : this.route2;
+		O output = Executor.execute(route, input);
 
 		this.output.getInEdge().setValue(output);
 	}

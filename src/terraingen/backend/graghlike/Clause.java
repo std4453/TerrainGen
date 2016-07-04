@@ -23,7 +23,7 @@ import java.util.Queue;
  * Therefore anyone who makes a structure with {@code Clause} should be aware of these
  * rules, while no further check is done while the structure is being built.
  */
-public class Clause<I, O> extends Statement<I, O> {
+public class Clause<I, O> extends Statement<I, O> implements IProcessorLike<I, O> {
 	private static Log log = LogFactory.getLog(Clause.class);
 
 	protected IInput<I> input;
@@ -59,6 +59,14 @@ public class Clause<I, O> extends Statement<I, O> {
 		this.edges = new ArrayList<>();
 		this.statements = new ArrayList<>();
 		buildCaches();
+	}
+
+	public Clause(IOutput<O> contentOutput, IInput<I> contentInput) {
+		this(contentInput, contentOutput);
+	}
+
+	public Clause(IProcessorLike<I, O> statement) {
+		this(statement.getInput(), statement.getOutput());
 	}
 
 	protected void buildCaches() {
@@ -166,10 +174,12 @@ public class Clause<I, O> extends Statement<I, O> {
 		this.output.getInEdge().setValue(output);
 	}
 
+	@Override
 	public IInput<I> getInput() {
 		return this.input;
 	}
 
+	@Override
 	public IOutput<O> getOutput() {
 		return this.output;
 	}
