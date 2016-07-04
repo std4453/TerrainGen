@@ -11,14 +11,6 @@ public class IfClause<I, O> extends Node<I, O> {
 	protected Statement<I, O> route1;
 	protected Statement<I, O> route2;
 
-	protected Edge<I> route1Head;
-	protected Edge<I> route2Head;
-	protected Edge<O> route1Tail;
-	protected Edge<O> route2Tail;
-
-	protected Edge<I> conditionerHead;
-	protected Edge<Boolean> conditionerTail;
-
 	protected InputPort<I> input;
 	protected OutputPort<O> output;
 
@@ -28,14 +20,6 @@ public class IfClause<I, O> extends Node<I, O> {
 		this.conditioner = conditioner;
 		this.route1 = route1;
 		this.route2 = route2;
-
-		// bind half edges
-		this.route1Head = new Edge<>(null, this.route1.getInput());
-		this.route2Head = new Edge<>(null, this.route2.getInput());
-		this.route1Tail = new Edge<>(this.route1.getOutput(), null);
-		this.route2Tail = new Edge<>(this.route2.getOutput(), null);
-		this.conditionerHead = new Edge<>(null, this.conditioner.getInput());
-		this.conditionerTail = new Edge<>(this.conditioner.getOutput(), null);
 
 		// external input & output
 		this.input = new InputPort<>(this);

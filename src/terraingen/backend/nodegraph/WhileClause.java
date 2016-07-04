@@ -11,10 +11,6 @@ package terraingen.backend.nodegraph;
 public class WhileClause<V> extends Node<V, V> {
 	protected Statement<V, Boolean> interrupter;
 	protected Statement<V, V> body;
-	protected Edge<V> interrupterHead;
-	protected Edge<Boolean> interrupterTail;
-	protected Edge<V> bodyHead;
-	protected Edge<V> bodyTail;
 
 	protected InputPort<V> input;
 	protected OutputPort<V> output;
@@ -22,11 +18,6 @@ public class WhileClause<V> extends Node<V, V> {
 	public WhileClause(Statement<V, Boolean> interrupter, Statement<V, V> body) {
 		this.interrupter = interrupter;
 		this.body = body;
-
-		this.interrupterHead = new Edge<>(null, interrupter.getInput());
-		this.interrupterTail = new Edge<>(interrupter.getOutput(), null);
-		this.bodyHead = new Edge<>(null, body.getInput());
-		this.bodyTail = new Edge<>(body.getOutput(), null);
 
 		this.input = new InputPort<>(this);
 		this.output = new OutputPort<>(this);

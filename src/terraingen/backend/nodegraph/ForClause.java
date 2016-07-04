@@ -15,14 +15,7 @@ public class ForClause<I, V> extends Node<V, V> {
 	protected Statement<I, Boolean> interrupter;
 	protected Statement<I, I> iteration;
 	protected Statement<V, V> body;
-
 	protected Edge<I> initializerTail;
-	protected Edge<I> interrupterHead;
-	protected Edge<Boolean> interruptedTail;
-	protected Edge<I> iterationHead;
-	protected Edge<I> iterationTail;
-	protected Edge<V> bodyHead;
-	protected Edge<V> bodyTail;
 
 	protected InputPort<V> input;
 	protected OutputPort<V> output;
@@ -35,14 +28,7 @@ public class ForClause<I, V> extends Node<V, V> {
 		this.interrupter = interrupter;
 		this.iteration = iteration;
 		this.body = body;
-
 		this.initializerTail = new Edge<>(initializer.getOutput(), null);
-		this.interrupterHead = new Edge<>(null, interrupter.getInput());
-		this.interruptedTail = new Edge<>(interrupter.getOutput(), null);
-		this.iterationHead = new Edge<>(null, iteration.getInput());
-		this.iterationTail = new Edge<>(iteration.getOutput(), null);
-		this.bodyHead = new Edge<>(null, body.getInput());
-		this.bodyTail = new Edge<>(body.getOutput(), null);
 
 		this.input = new InputPort<>(this);
 		this.output = new OutputPort<>(this);

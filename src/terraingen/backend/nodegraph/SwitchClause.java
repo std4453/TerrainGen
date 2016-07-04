@@ -3,7 +3,6 @@ package terraingen.backend.nodegraph;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -16,10 +15,6 @@ public class SwitchClause<K, I, O> extends Node<I, O> {
 
 	protected Statement<I, K> mapper;
 	protected Map<K, Statement<I, O>> map;
-	protected Map<K, Edge<I>> headsMap;
-	protected Map<K, Edge<O>> tailsMap;
-	protected Edge<I> mapperHead;
-	protected Edge<K> mapperTail;
 
 	protected InputPort<I> input;
 	protected OutputPort<O> output;
@@ -27,18 +22,6 @@ public class SwitchClause<K, I, O> extends Node<I, O> {
 	public SwitchClause(Statement<I, K> mapper, Map<K, Statement<I, O>> map) {
 		this.mapper = mapper;
 		this.map = map;
-
-		// bind half edges
-		this.headsMap = new HashMap<>();
-		this.tailsMap = new HashMap<>();
-		this.mapperHead = new Edge<>(null, mapper.getInput());
-		this.mapperTail = new Edge<>(mapper.getOutput(), null);
-		for (Map.Entry<K, Statement<I, O>> entry : map.entrySet()) {
-			Edge<I> headEdge = new Edge<>(null, entry.getValue().getInput());
-			Edge<O> tailEdge = new Edge<>(entry.getValue().getOutput(), null);
-			this.headsMap.put(entry.getKey(), headEdge);
-			this.tailsMap.put(entry.getKey(), tailEdge);
-		}
 
 		// external input & output
 		this.input = new InputPort<>(this);
