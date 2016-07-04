@@ -63,10 +63,6 @@ public class Statement<I, O> extends Node<I, O> implements IProcessorLike<I, O> 
 		this(contentInput, contentOutput);
 	}
 
-	public Statement(IProcessorLike<I, O> statement) {
-		this(statement.getInput(), statement.getOutput());
-	}
-
 	/**
 	 * Convenient constructor to generate a {@code Statement} wrapping a given node, uses
 	 * first input and output port of the given node.<br />

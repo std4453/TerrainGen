@@ -31,8 +31,7 @@ public class SwitchClauseTest {
 			routes.put(seasons[i], new Statement<>(new ProcessorNode<>(processor)));
 		SwitchClause<String, Integer, String> switchClause = new SwitchClause<>(new
 				Statement<>(new ProcessorNode<>(mapper)), routes);
-		Statement<Integer, String> switchClauseStatement = new Statement<>(
-				(IProcessorLike<Integer, String>) switchClause);
+		Statement<Integer, String> switchClauseStatement = new Statement<>(switchClause);
 
 		for (int i = 0; i < 12; ++i)
 			System.out.println(Executor.execute(switchClauseStatement, i));
