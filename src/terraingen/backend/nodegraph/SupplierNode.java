@@ -10,16 +10,16 @@ package terraingen.backend.nodegraph;
  */
 public class SupplierNode<O> extends Node<Object, O> {
 	protected ISupplier<O> supplier;
-	protected IOutput<O> output;
+	protected OutputPort<O> output;
 
 	public SupplierNode(ISupplier<O> supplier) {
 		this.supplier = supplier;
 
-		this.output = new IOutput<>(this);
+		this.output = new OutputPort<>(this);
 		this.outputCollection.add(this.output);
 	}
 
-	public IOutput<O> getOutput() {
+	public OutputPort<O> getOutput() {
 		return this.output;
 	}
 

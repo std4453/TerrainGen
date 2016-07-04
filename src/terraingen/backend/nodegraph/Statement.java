@@ -26,8 +26,8 @@ import java.util.Queue;
 public class Statement<I, O> extends Node<I, O> implements IProcessorLike<I, O> {
 	private static Log log = LogFactory.getLog(Statement.class);
 
-	protected IInput<I> input;
-	protected IOutput<O> output;
+	protected InputPort<I> input;
+	protected OutputPort<O> output;
 
 	protected BlankNode<I> head;
 	protected Edge<I> headHalfEdge;
@@ -38,10 +38,10 @@ public class Statement<I, O> extends Node<I, O> implements IProcessorLike<I, O> 
 	protected List<Edge> edges;
 	protected List<Node> nodes;
 
-	public Statement(IInput<I> contentInput, IOutput<O> contentOutput) {
+	public Statement(InputPort<I> contentInput, OutputPort<O> contentOutput) {
 		// input & output for external access
-		this.input = new IInput<>(this);
-		this.output = new IOutput<>(this);
+		this.input = new InputPort<>(this);
+		this.output = new OutputPort<>(this);
 		this.inputCollection.add(this.input);
 		this.outputCollection.add(this.output);
 
@@ -61,7 +61,7 @@ public class Statement<I, O> extends Node<I, O> implements IProcessorLike<I, O> 
 		buildCaches();
 	}
 
-	public Statement(IOutput<O> contentOutput, IInput<I> contentInput) {
+	public Statement(OutputPort<O> contentOutput, InputPort<I> contentInput) {
 		this(contentInput, contentOutput);
 	}
 
@@ -82,9 +82,9 @@ public class Statement<I, O> extends Node<I, O> implements IProcessorLike<I, O> 
 			if (node != this.head) {
 				List inputs = node.getInputs();
 				for (Object inputObj : inputs) {
-					if (!(inputObj instanceof IInput))
+					if (!(inputObj instanceof InputPort))
 						continue;
-					IInput<?> input = (IInput) inputObj;
+					InputPort<?> input = (InputPort) inputObj;
 					this.edges.add(input.getOutEdge());
 					Node ancestor = input.getOutEdge().getOutput().getParent();
 					if (!this.nodes.contains(ancestor)) {
@@ -120,9 +120,9 @@ public class Statement<I, O> extends Node<I, O> implements IProcessorLike<I, O> 
 		boolean nodeReady = true;
 		List inputList = node.getInputs();
 		for (Object inputObj : inputList) {
-			if (!(inputObj instanceof IInput))
+			if (!(inputObj instanceof InputPort))
 				continue;
-			IInput<?> input = (IInput) inputObj;
+			InputPort<?> input = (InputPort) inputObj;
 			if (input.getOutEdge() == null || !input.getOutEdge().isValueSet()) {
 				nodeReady = false;
 				break;
@@ -167,9 +167,9 @@ public class Statement<I, O> extends Node<I, O> implements IProcessorLike<I, O> 
 			if (node != this.tail) {
 				List outputs = node.getOutputs();
 				for (Object outputObj : outputs) {
-					if (!(outputObj instanceof IOutput))
+					if (!(outputObj instanceof OutputPort))
 						continue;
-					IOutput<?> output = (IOutput) outputObj;
+					OutputPort<?> output = (OutputPort) outputObj;
 					if (output.getInEdge() == null) {
 						log.warn("Output should have an edge.");
 						continue;
@@ -185,12 +185,12 @@ public class Statement<I, O> extends Node<I, O> implements IProcessorLike<I, O> 
 	}
 
 	@Override
-	public IInput<I> getInput() {
+	public InputPort<I> getInput() {
 		return this.input;
 	}
 
 	@Override
-	public IOutput<O> getOutput() {
+	public OutputPort<O> getOutput() {
 		return this.output;
 	}
 }

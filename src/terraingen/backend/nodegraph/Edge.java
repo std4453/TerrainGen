@@ -6,10 +6,10 @@ package terraingen.backend.nodegraph;
 public class Edge<V> {
 	protected V value = null;
 	protected boolean valueSet = false;
-	protected IInput<V> input;
-	protected IOutput<V> output;
+	protected InputPort<V> input;
+	protected OutputPort<V> output;
 
-	public Edge(IInput<V> input, IOutput<V> output) {
+	public Edge(InputPort<V> input, OutputPort<V> output) {
 		this.input = input;
 		this.output = output;
 
@@ -19,7 +19,7 @@ public class Edge<V> {
 			output.setInEdge(this);
 	}
 
-	public Edge(IOutput<V> output, IInput<V> input) {
+	public Edge(OutputPort<V> output, InputPort<V> input) {
 		this(input, output);
 	}
 
@@ -36,19 +36,19 @@ public class Edge<V> {
 		this.value = value;
 	}
 
-	public IInput<V> getInput() {
+	public InputPort<V> getInput() {
 		return this.input;
 	}
 
-	public void setInput(IInput<V> input) {
+	public void setInput(InputPort<V> input) {
 		this.input = input;
 	}
 
-	public IOutput<V> getOutput() {
+	public OutputPort<V> getOutput() {
 		return this.output;
 	}
 
-	public void setOutput(IOutput<V> output) {
+	public void setOutput(OutputPort<V> output) {
 		this.output = output;
 	}
 

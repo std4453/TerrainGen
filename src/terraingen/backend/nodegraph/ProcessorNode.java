@@ -5,23 +5,23 @@ package terraingen.backend.nodegraph;
  */
 public class ProcessorNode<I, O> extends Node<I, O> {
 	protected IProcessor<I, O> processor;
-	protected IInput<I> input;
-	protected IOutput<O> output;
+	protected InputPort<I> input;
+	protected OutputPort<O> output;
 
 	public ProcessorNode(IProcessor<I, O> processor) {
 		this.processor = processor;
 
-		this.input = new IInput<>(this);
-		this.output = new IOutput<>(this);
+		this.input = new InputPort<>(this);
+		this.output = new OutputPort<>(this);
 		this.inputCollection.add(this.input);
 		this.outputCollection.add(this.output);
 	}
 
-	public IInput<I> getInput() {
+	public InputPort<I> getInput() {
 		return this.input;
 	}
 
-	public IOutput<O> getOutput() {
+	public OutputPort<O> getOutput() {
 		return this.output;
 	}
 

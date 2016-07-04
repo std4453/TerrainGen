@@ -10,19 +10,19 @@ import java.util.List;
 public abstract class Node<I, O> {
 	protected boolean executed = false;
 
-	protected List<IInput<I>> inputCollection;
-	protected List<IOutput<O>> outputCollection;
+	protected List<InputPort<I>> inputCollection;
+	protected List<OutputPort<O>> outputCollection;
 
 	public Node() {
 		this.inputCollection = new ArrayList<>();
 		this.outputCollection = new ArrayList<>();
 	}
 
-	public List<IInput<I>> getInputs() {
+	public List<InputPort<I>> getInputs() {
 		return this.inputCollection;
 	}
 
-	public List<IOutput<O>> getOutputs() {
+	public List<OutputPort<O>> getOutputs() {
 		return this.outputCollection;
 	}
 

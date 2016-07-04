@@ -3,11 +3,11 @@ package terraingen.backend.nodegraph;
 /**
  * Output interface of {@link Node}
  */
-public class IOutput<O> {
+public class OutputPort<O> {
 	protected final Node<?, O> parent;
 	protected Edge<O> inEdge;
 
-	public IOutput(Node<?, O> parent) {
+	public OutputPort(Node<?, O> parent) {
 		this.parent = parent;
 	}
 

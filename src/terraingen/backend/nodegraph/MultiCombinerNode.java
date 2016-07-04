@@ -8,24 +8,24 @@ import java.util.List;
  */
 public class MultiCombinerNode<I, O> extends Node<I, O> {
 	protected IMultiCombiner<I, O> multiCombiner;
-	protected IOutput<O> output;
+	protected OutputPort<O> output;
 
 	public MultiCombinerNode(IMultiCombiner<I, O> multiCombiner, int inputCount) {
 		this.multiCombiner = multiCombiner;
 
-		this.output = new IOutput<>(this);
+		this.output = new OutputPort<>(this);
 		this.outputCollection.add(this.output);
 		for (int i = 0; i < inputCount; ++i) {
-			IInput<I> input = new IInput<>(this);
+			InputPort<I> input = new InputPort<>(this);
 			this.inputCollection.add(input);
 		}
 	}
 
-	public IInput<I> getInput(int n) {
+	public InputPort<I> getInput(int n) {
 		return this.inputCollection.get(n);
 	}
 
-	public IOutput<O> getOutput() {
+	public OutputPort<O> getOutput() {
 		return this.output;
 	}
 

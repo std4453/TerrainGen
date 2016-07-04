@@ -7,24 +7,24 @@ import java.util.List;
  */
 public class DisassemblerNode<I, O> extends Node<I, O> {
 	protected IDisassembler<I, O> disassembler;
-	protected IInput<I> input;
+	protected InputPort<I> input;
 
 	public DisassemblerNode(IDisassembler<I, O> disassembler, int outputCount) {
 		this.disassembler = disassembler;
 
-		this.input = new IInput<>(this);
+		this.input = new InputPort<>(this);
 		this.inputCollection.add(this.input);
 		for (int i = 0; i < outputCount; ++i) {
-			IOutput<O> output = new IOutput<>(this);
+			OutputPort<O> output = new OutputPort<>(this);
 			this.outputCollection.add(output);
 		}
 	}
 
-	public IInput<I> getInput() {
+	public InputPort<I> getInput() {
 		return this.input;
 	}
 
-	public IOutput<O> getOutput(int n) {
+	public OutputPort<O> getOutput(int n) {
 		return this.outputCollection.get(n);
 	}
 

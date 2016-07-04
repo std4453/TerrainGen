@@ -5,9 +5,9 @@ package terraingen.backend.nodegraph;
  */
 public class CombinerNode<I, O> extends Node<I, O> {
 	protected ICombiner<I, O> combiner;
-	protected IInput<I> input1;
-	protected IInput<I> input2;
-	protected IOutput<O> output;
+	protected InputPort<I> input1;
+	protected InputPort<I> input2;
+	protected OutputPort<O> output;
 
 	/**
 	 * Null combiner is not accepted.
@@ -15,23 +15,23 @@ public class CombinerNode<I, O> extends Node<I, O> {
 	public CombinerNode(ICombiner<I, O> combiner) {
 		this.combiner = combiner;
 
-		this.input1 = new IInput<>(this);
-		this.input2 = new IInput<>(this);
-		this.output = new IOutput<>(this);
+		this.input1 = new InputPort<>(this);
+		this.input2 = new InputPort<>(this);
+		this.output = new OutputPort<>(this);
 		this.inputCollection.add(this.input1);
 		this.inputCollection.add(this.input2);
 		this.outputCollection.add(this.output);
 	}
 
-	public IInput<I> getInput1() {
+	public InputPort<I> getInput1() {
 		return this.input1;
 	}
 
-	public IInput<I> getInput2() {
+	public InputPort<I> getInput2() {
 		return this.input2;
 	}
 
-	public IOutput<O> getOutput() {
+	public OutputPort<O> getOutput() {
 		return this.output;
 	}
 

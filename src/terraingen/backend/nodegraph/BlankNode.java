@@ -4,12 +4,12 @@ package terraingen.backend.nodegraph;
  * input: v, output: v
  */
 public class BlankNode<V> extends Node<V, V> {
-	protected IInput<V> input;
-	protected IOutput<V> output;
+	protected InputPort<V> input;
+	protected OutputPort<V> output;
 
 	public BlankNode() {
-		this.input = new IInput<>(this);
-		this.output = new IOutput<>(this);
+		this.input = new InputPort<>(this);
+		this.output = new OutputPort<>(this);
 		this.inputCollection.add(this.input);
 		this.outputCollection.add(this.output);
 	}

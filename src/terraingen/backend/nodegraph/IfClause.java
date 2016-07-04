@@ -19,8 +19,8 @@ public class IfClause<I, O> extends Node<I, O> implements IProcessorLike<I, O> {
 	protected Edge<I> conditionerHead;
 	protected Edge<Boolean> conditionerTail;
 
-	protected IInput<I> input;
-	protected IOutput<O> output;
+	protected InputPort<I> input;
+	protected OutputPort<O> output;
 
 	public IfClause(Statement<I, Boolean> conditioner, Statement<I, O> route1,
 					Statement<I, O>
@@ -38,19 +38,19 @@ public class IfClause<I, O> extends Node<I, O> implements IProcessorLike<I, O> {
 		this.conditionerTail = new Edge<>(this.conditioner.getOutput(), null);
 
 		// external input & output
-		this.input = new IInput<>(this);
-		this.output = new IOutput<>(this);
+		this.input = new InputPort<>(this);
+		this.output = new OutputPort<>(this);
 		this.inputCollection.add(this.input);
 		this.outputCollection.add(this.output);
 	}
 
 	@Override
-	public IInput<I> getInput() {
+	public InputPort<I> getInput() {
 		return this.input;
 	}
 
 	@Override
-	public IOutput<O> getOutput() {
+	public OutputPort<O> getOutput() {
 		return this.output;
 	}
 

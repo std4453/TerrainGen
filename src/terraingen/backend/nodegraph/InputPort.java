@@ -3,11 +3,11 @@ package terraingen.backend.nodegraph;
 /**
  * Input interface of {@link Node}
  */
-public class IInput<I> {
+public class InputPort<I> {
 	protected final Node<I, ?> parent;
 	protected Edge<I> outEdge;
 
-	public IInput(Node<I, ?> parent) {
+	public InputPort(Node<I, ?> parent) {
 		this.parent = parent;
 	}
 
