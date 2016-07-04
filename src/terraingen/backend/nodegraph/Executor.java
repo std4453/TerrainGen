@@ -1,7 +1,7 @@
 package terraingen.backend.nodegraph;
 
 /**
- * Execute given {@link Clause} / {@link Statement}
+ * Execute given {@link Clause} / {@link Node}
  */
 public class Executor {
 	/**
@@ -33,27 +33,27 @@ public class Executor {
 	}
 
 	/**
-	 * This method is not recommended to use, as it wraps the given {@link Statement}
+	 * This method is not recommended to use, as it wraps the given {@link Node}
 	 * with a {@link Clause} whose reference is not returned. If further modification
-	 * occurs on the {@link Statement}, errors may occur, therefore this method should
-	 * be called with a {@link Statement} as input only when the {@link Statement}
+	 * occurs on the {@link Node}, errors may occur, therefore this method should
+	 * be called with a {@link Node} as input only when the {@link Node}
 	 * wouldn't be changed in any case.<br />
 	 * ( Theoretically interface {@link IProcessorLike} should be implemented by an
-	 * subclass of {@link Statement}, though there is no technical way to ensure this )
+	 * subclass of {@link Node}, though there is no technical way to ensure this )
 	 *
-	 * @param statement
-	 * 		The {@link Statement} to execute
+	 * @param node
+	 * 		The {@link Node} to execute
 	 * @param input
-	 * 		Input to the {@link Statement}
+	 * 		Input to the {@link Node}
 	 * @param <I>
 	 * 		Input class
 	 * @param <O>
 	 * 		Output class
 	 *
-	 * @return Execution result of the {@link Statement}.
+	 * @return Execution result of the {@link Node}.
 	 */
-	public static <I, O> O execute(IProcessorLike<I, O> statement, I input) {
-		Clause<I, O> clause = new Clause<>(statement);
+	public static <I, O> O execute(IProcessorLike<I, O> node, I input) {
+		Clause<I, O> clause = new Clause<>(node);
 		return execute(clause, input);
 	}
 }

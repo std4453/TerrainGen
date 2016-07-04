@@ -3,13 +3,13 @@ package terraingen.backend.nodegraph;
 import java.util.List;
 
 /**
- * Wrapper statement: {@link IDisassembler}
+ * Wrapper node: {@link IDisassembler}
  */
-public class DisassemblerStatement<I, O> extends Statement<I, O> {
+public class DisassemblerNode<I, O> extends Node<I, O> {
 	protected IDisassembler<I, O> disassembler;
 	protected IInput<I> input;
 
-	public DisassemblerStatement(IDisassembler<I, O> disassembler, int outputCount) {
+	public DisassemblerNode(IDisassembler<I, O> disassembler, int outputCount) {
 		this.disassembler = disassembler;
 
 		this.input = new IInput<>(this);

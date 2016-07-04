@@ -9,13 +9,13 @@ import java.util.List;
 import java.util.Queue;
 
 /**
- * A clause contains many {@link Statement}s and execute them.<br />
+ * A clause contains many {@link Node}s and execute them.<br />
  * One execution process should follow the following rules:<br />
  * <ol>
- * <li>One statement can be executed only once</li>
- * <li>One statement is executed only after every {@link Statement} that serves
- * as its predecessor ( head ) is successfully executed</li>
- * <li>There is only one head and one tail ( while multiple head & tail can be
+ * <li>One node can be executed only once</li>
+ * <li>One node is executed only after every {@link Node} that serves as its
+ * predecessor ( head ) is successfully executed</li>
+ * <li>There is only one input and one output ( while multiple input & output can be
  * achieved using arrays or other collections )</li>
  * <li>No loop should be formed in a clause ( Loops are achieved using
  * {@link LoopStatement} )</li>
@@ -23,20 +23,20 @@ import java.util.Queue;
  * Therefore anyone who makes a structure with {@code Clause} should be aware of these
  * rules, while no further check is done while the structure is being built.
  */
-public class Clause<I, O> extends Statement<I, O> implements IProcessorLike<I, O> {
+public class Clause<I, O> extends Node<I, O> implements IProcessorLike<I, O> {
 	private static Log log = LogFactory.getLog(Clause.class);
 
 	protected IInput<I> input;
 	protected IOutput<O> output;
 
-	protected BlankStatement<I> head;
+	protected BlankNode<I> head;
 	protected Edge<I> headHalfEdge;
-	protected BlankStatement<O> tail;
+	protected BlankNode<O> tail;
 	protected Edge<O> tailHalfEdge;
 
-	protected List<SupplierStatement> suppliers;
+	protected List<SupplierNode> suppliers;
 	protected List<Edge> edges;
-	protected List<Statement> statements;
+	protected List<Node> nodes;
 
 	public Clause(IInput<I> contentInput, IOutput<O> contentOutput) {
 		// input & output for external access
@@ -46,8 +46,8 @@ public class Clause<I, O> extends Statement<I, O> implements IProcessorLike<I, O
 		this.outputCollection.add(this.output);
 
 		// input & output for internal access
-		this.head = new BlankStatement<>();
-		this.tail = new BlankStatement<>();
+		this.head = new BlankNode<>();
+		this.tail = new BlankNode<>();
 		// half-edges to pass data between inside and outside
 		this.headHalfEdge = new Edge<>(null, this.head.getInputs().get(0));
 		this.tailHalfEdge = new Edge<>(this.tail.getOutputs().get(0), null);
@@ -57,7 +57,7 @@ public class Clause<I, O> extends Statement<I, O> implements IProcessorLike<I, O
 		// caches
 		this.suppliers = new ArrayList<>();
 		this.edges = new ArrayList<>();
-		this.statements = new ArrayList<>();
+		this.nodes = new ArrayList<>();
 		buildCaches();
 	}
 
@@ -70,26 +70,26 @@ public class Clause<I, O> extends Statement<I, O> implements IProcessorLike<I, O
 	}
 
 	protected void buildCaches() {
-		Queue<Statement> queue = new ArrayDeque<>();
+		Queue<Node> queue = new ArrayDeque<>();
 		queue.offer(this.tail);
-		this.statements.add(this.tail);
+		this.nodes.add(this.tail);
 		while (!queue.isEmpty()) {
-			Statement statement = queue.poll();
+			Node node = queue.poll();
 
-			if (statement instanceof SupplierStatement)
-				this.suppliers.add((SupplierStatement) statement);
+			if (node instanceof SupplierNode)
+				this.suppliers.add((SupplierNode) node);
 
-			if (statement != this.head) {
-				List inputs = statement.getInputs();
+			if (node != this.head) {
+				List inputs = node.getInputs();
 				for (Object inputObj : inputs) {
 					if (!(inputObj instanceof IInput))
 						continue;
 					IInput<?> input = (IInput) inputObj;
 					this.edges.add(input.getOutEdge());
-					Statement ancestor = input.getOutEdge().getOutput().getParent();
-					if (!this.statements.contains(ancestor)) {
+					Node ancestor = input.getOutEdge().getOutput().getParent();
+					if (!this.nodes.contains(ancestor)) {
 						queue.offer(ancestor);
-						this.statements.add(ancestor);
+						this.nodes.add(ancestor);
 					}
 				}
 			}
@@ -97,39 +97,39 @@ public class Clause<I, O> extends Statement<I, O> implements IProcessorLike<I, O
 	}
 	
 	/**
-	 * Calls {@code clearValue()} of every edge of statements in this clause and
+	 * Calls {@code clearValue()} of every edge of nodes in this clause and
 	 * {@code clearExecuted()} of every statement ( except for {@code this.head} &
 	 * {@code this.tail} )
 	 */
 	protected void clear() {
 		for (Edge edge : this.edges)
 			edge.clearValue();
-		for (Statement statement : this.statements)
-			statement.clearExecuted();
+		for (Node node : this.nodes)
+			node.clearExecuted();
 	}
 
 	/**
-	 * Is every head of this statement provided with data?
+	 * Is every head of this node provided with data?
 	 *
-	 * @param statement
-	 * 		The statement to check
+	 * @param node
+	 * 		The node to check
 	 *
-	 * @return Whether the statement ready for execution
+	 * @return Whether the node ready for execution
 	 */
-	protected boolean isStatementReady(Statement statement) {
-		boolean statementReady = true;
-		List inputList = statement.getInputs();
+	protected boolean isNodeReady(Node node) {
+		boolean nodeReady = true;
+		List inputList = node.getInputs();
 		for (Object inputObj : inputList) {
 			if (!(inputObj instanceof IInput))
 				continue;
 			IInput<?> input = (IInput) inputObj;
 			if (input.getOutEdge() == null || !input.getOutEdge().isValueSet()) {
-				statementReady = false;
+				nodeReady = false;
 				break;
 			}
 		}
 		
-		return statementReady;
+		return nodeReady;
 	}
 	
 	@Override
@@ -144,28 +144,28 @@ public class Clause<I, O> extends Statement<I, O> implements IProcessorLike<I, O
 		this.headHalfEdge.setValue(input);
 
 		// execute using BFS
-		Queue<Statement> queue = new ArrayDeque<>();
+		Queue<Node> queue = new ArrayDeque<>();
 		queue.offer(this.head);
-		for (SupplierStatement supplier : this.suppliers)
+		for (SupplierNode supplier : this.suppliers)
 			queue.offer(supplier);
-		Statement statement;
+		Node node;
 		while (!queue.isEmpty()) {
-			statement = queue.poll();
+			node = queue.poll();
 
-			// check whether the statement is ready for execution
-			if (statement == null) {
-				log.warn("Non-null statement.");
+			// check whether the node is ready for execution
+			if (node == null) {
+				log.warn("Non-null node.");
 				continue;
 			}
-			if (statement.isExecuted() || !isStatementReady(statement))
+			if (node.isExecuted() || !isNodeReady(node))
 				continue;
 
 			// execute it!
-			statement.execute();
+			node.execute();
 
 			// add its descendants to the queue, if, it is not the final one
-			if (statement != this.tail) {
-				List outputs = statement.getOutputs();
+			if (node != this.tail) {
+				List outputs = node.getOutputs();
 				for (Object outputObj : outputs) {
 					if (!(outputObj instanceof IOutput))
 						continue;

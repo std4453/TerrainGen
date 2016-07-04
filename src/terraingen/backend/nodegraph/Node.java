@@ -4,16 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Statement that have single / multiple head and tail, class set to abstract that
+ * Node that have single / multiple head and tail, class set to abstract that
  * it cannot be instantiated.
  */
-public abstract class Statement<I, O> {
+public abstract class Node<I, O> {
 	protected boolean executed = false;
 
 	protected List<IInput<I>> inputCollection;
 	protected List<IOutput<O>> outputCollection;
 
-	public Statement() {
+	public Node() {
 		this.inputCollection = new ArrayList<>();
 		this.outputCollection = new ArrayList<>();
 	}
@@ -40,7 +40,7 @@ public abstract class Statement<I, O> {
 	 * of this method.<br /><
 	 * <br />
 	 * Note that this method is not exception-free, any kind of exception can be thrown
-	 * because of wrong usage of the whole structure, like: unassigned edge, edgeless
+	 * because of wrong usage of the whole model, like: unassigned edge, edgeless
 	 * head / tail, algorithm error, wrong head etc.. Anyone who works on it should
 	 * be aware of what would happen while calling this method, thus making it
 	 * exception-free with his / her own brain.

@@ -7,21 +7,21 @@ import terraingen.backend.nodegraph.*;
  */
 public class IfClauseTest {
 	public static void main(String[] args) {
-		ProcessorStatement<Integer, Boolean> conditioner = new ProcessorStatement<>(
+		ProcessorNode<Integer, Boolean> conditioner = new ProcessorNode<>(
 				new IProcessor<Integer, Boolean>() {
 					@Override
 					public Boolean process(Integer input) {
 						return input % 2 == 0;
 					}
 				});
-		ProcessorStatement<Integer, String> route1 = new ProcessorStatement<>(
+		ProcessorNode<Integer, String> route1 = new ProcessorNode<>(
 				new IProcessor<Integer, String>() {
 					@Override
 					public String process(Integer input) {
 						return String.format("%s is an even number", input);
 					}
 				});
-		ProcessorStatement<Integer, String> route2 = new ProcessorStatement<>(
+		ProcessorNode<Integer, String> route2 = new ProcessorNode<>(
 				new IProcessor<Integer, String>() {
 					@Override
 					public String process(Integer input) {

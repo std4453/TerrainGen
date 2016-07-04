@@ -1,18 +1,18 @@
 package terraingen.backend.nodegraph;
 
 /**
- * Wrapper statement: {@link ISupplier}<br />
- * Theoretically an instance of SupplierStatement won't be executed during the
+ * Wrapper node: {@link ISupplier}<br />
+ * Theoretically an instance of SupplierNode won't be executed during the
  * execution of an {@link Clause}, since it has no head edges, therefore instances of
- * SupplierStatement under a {@link Clause} is collected when the {@link Clause} is
+ * SupplierNode under a {@link Clause} is collected when the {@link Clause} is
  * being built, and their {@code execute()} method is invoked and their tail edges are
  * set.
  */
-public class SupplierStatement<O> extends Statement<Object, O> {
+public class SupplierNode<O> extends Node<Object, O> {
 	protected ISupplier<O> supplier;
 	protected IOutput<O> output;
 
-	public SupplierStatement(ISupplier<O> supplier) {
+	public SupplierNode(ISupplier<O> supplier) {
 		this.supplier = supplier;
 
 		this.output = new IOutput<>(this);

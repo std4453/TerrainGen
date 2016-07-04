@@ -1,17 +1,17 @@
 package terraingen.backend.nodegraph;
 
 /**
- * Output interface of {@link Statement}
+ * Output interface of {@link Node}
  */
 public class IOutput<O> {
-	protected final Statement<?, O> parent;
+	protected final Node<?, O> parent;
 	protected Edge<O> inEdge;
 
-	public IOutput(Statement<?, O> parent) {
+	public IOutput(Node<?, O> parent) {
 		this.parent = parent;
 	}
 
-	public Statement<?, O> getParent() {
+	public Node<?, O> getParent() {
 		return this.parent;
 	}
 

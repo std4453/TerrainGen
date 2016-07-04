@@ -1,14 +1,14 @@
 package terraingen.backend.nodegraph;
 
 /**
- * Wrapper statement: {@link IProcessor}
+ * Wrapper node: {@link IProcessor}
  */
-public class ProcessorStatement<I, O> extends Statement<I, O> {
+public class ProcessorNode<I, O> extends Node<I, O> {
 	protected IProcessor<I, O> processor;
 	protected IInput<I> input;
 	protected IOutput<O> output;
 
-	public ProcessorStatement(IProcessor<I, O> processor) {
+	public ProcessorNode(IProcessor<I, O> processor) {
 		this.processor = processor;
 
 		this.input = new IInput<>(this);

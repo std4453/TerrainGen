@@ -1,17 +1,17 @@
 package terraingen.backend.nodegraph;
 
 /**
- * Input interface of {@link Statement}
+ * Input interface of {@link Node}
  */
 public class IInput<I> {
-	protected final Statement<I, ?> parent;
+	protected final Node<I, ?> parent;
 	protected Edge<I> outEdge;
 
-	public IInput(Statement<I, ?> parent) {
+	public IInput(Node<I, ?> parent) {
 		this.parent = parent;
 	}
 
-	public Statement<I, ?> getParent() {
+	public Node<I, ?> getParent() {
 		return this.parent;
 	}
 

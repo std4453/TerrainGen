@@ -11,21 +11,21 @@ import java.util.List;
 public class ClauseTest1 {
 	public static void main(String[] args) {
 		// create
-		DisassemblerStatement<Integer[], Integer> s1 = new DisassemblerStatement<>(
+		DisassemblerNode<Integer[], Integer> s1 = new DisassemblerNode<>(
 				new IDisassembler<Integer[], Integer>() {
 					@Override
 					public List<Integer> disassemble(Integer[] input) {
 						return Arrays.asList(input);
 					}
 				}, 3);
-		CombinerStatement<Integer, Integer> s2 = new CombinerStatement<>(
+		CombinerNode<Integer, Integer> s2 = new CombinerNode<>(
 				new ICombiner<Integer, Integer>() {
 					@Override
 					public Integer combine(Integer input1, Integer input2) {
 						return input1 + input2;
 					}
 				});
-		MultiCombinerStatement<Integer, Integer> s3 = new MultiCombinerStatement<>(
+		MultiCombinerNode<Integer, Integer> s3 = new MultiCombinerNode<>(
 				new IMultiCombiner<Integer, Integer>() {
 					@Override
 					public Integer combine(List<Integer> inputs) {
@@ -35,28 +35,28 @@ public class ClauseTest1 {
 						return s;
 					}
 				}, 3);
-		SupplierStatement<Integer> s4 = new SupplierStatement<>(
+		SupplierNode<Integer> s4 = new SupplierNode<>(
 				new ISupplier<Integer>() {
 					@Override
 					public Integer supply() {
 						return 2;
 					}
 				});
-		SupplierStatement<Integer> s5 = new SupplierStatement<>(
+		SupplierNode<Integer> s5 = new SupplierNode<>(
 				new ISupplier<Integer>() {
 					@Override
 					public Integer supply() {
 						return 1;
 					}
 				});
-		ProcessorStatement<Integer, Integer> s6 = new ProcessorStatement<>(
+		ProcessorNode<Integer, Integer> s6 = new ProcessorNode<>(
 				new IProcessor<Integer, Integer>() {
 					@Override
 					public Integer process(Integer input) {
 						return -input;
 					}
 				});
-		CombinerStatement<Integer, Integer> s7 = new CombinerStatement<>(
+		CombinerNode<Integer, Integer> s7 = new CombinerNode<>(
 				new ICombiner<Integer, Integer>() {
 					@Override
 					public Integer combine(Integer input1, Integer input2) {

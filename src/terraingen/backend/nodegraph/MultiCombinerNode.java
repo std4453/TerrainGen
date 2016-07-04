@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Wrapper statement: {@link IMultiCombiner}
+ * Wrapper node: {@link IMultiCombiner}
  */
-public class MultiCombinerStatement<I, O> extends Statement<I, O> {
+public class MultiCombinerNode<I, O> extends Node<I, O> {
 	protected IMultiCombiner<I, O> multiCombiner;
 	protected IOutput<O> output;
 
-	public MultiCombinerStatement(IMultiCombiner<I, O> multiCombiner, int inputCount) {
+	public MultiCombinerNode(IMultiCombiner<I, O> multiCombiner, int inputCount) {
 		this.multiCombiner = multiCombiner;
 
 		this.output = new IOutput<>(this);

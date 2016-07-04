@@ -10,28 +10,28 @@ import java.util.List;
  */
 public class ClauseTest2 {
 	public static void main(String[] args) {
-		DisassemblerStatement<Integer[], Integer> s1 = new DisassemblerStatement<>(
+		DisassemblerNode<Integer[], Integer> s1 = new DisassemblerNode<>(
 				new IDisassembler<Integer[], Integer>() {
 					@Override
 					public List<Integer> disassemble(Integer[] input) {
 						return Arrays.asList(input);
 					}
 				}, 2);
-		DisassemblerStatement<Integer, Integer> s2 = new DisassemblerStatement<>(
+		DisassemblerNode<Integer, Integer> s2 = new DisassemblerNode<>(
 				new IDisassembler<Integer, Integer>() {
 					@Override
 					public List<Integer> disassemble(Integer input) {
 						return Arrays.asList(input, input + 1);
 					}
 				}, 2);
-		CombinerStatement<Integer, Integer> s3 = new CombinerStatement<>(
+		CombinerNode<Integer, Integer> s3 = new CombinerNode<>(
 				new ICombiner<Integer, Integer>() {
 					@Override
 					public Integer combine(Integer input1, Integer input2) {
 						return input1 * input2;
 					}
 				});
-		CombinerStatement<Integer, Integer> s4 = new CombinerStatement<>(
+		CombinerNode<Integer, Integer> s4 = new CombinerNode<>(
 				new ICombiner<Integer, Integer>() {
 					@Override
 					public Integer combine(Integer input1, Integer input2) {

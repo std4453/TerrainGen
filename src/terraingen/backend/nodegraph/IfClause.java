@@ -6,7 +6,7 @@ package terraingen.backend.nodegraph;
  * an boolean value, while {@code true} means the first route ( {@code route1}: if-then
  * ), and false the second one ( {@code route2}: if-else )
  */
-public class IfClause<I, O> extends Statement<I, O> implements IProcessorLike<I, O> {
+public class IfClause<I, O> extends Node<I, O> implements IProcessorLike<I, O> {
 	protected Clause<I, Boolean> conditioner;
 	protected Clause<I, O> route1;
 	protected Clause<I, O> route2;

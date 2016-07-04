@@ -3,11 +3,11 @@ package terraingen.backend.nodegraph;
 /**
  * head: v, tail: v
  */
-public class BlankStatement<V> extends Statement<V, V> {
+public class BlankNode<V> extends Node<V, V> {
 	protected IInput<V> input;
 	protected IOutput<V> output;
 
-	public BlankStatement() {
+	public BlankNode() {
 		this.input = new IInput<>(this);
 		this.output = new IOutput<>(this);
 		this.inputCollection.add(this.input);

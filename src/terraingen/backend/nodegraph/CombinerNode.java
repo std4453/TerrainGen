@@ -1,18 +1,18 @@
 package terraingen.backend.nodegraph;
 
 /**
- * Wrapper statement: {@link ICombiner}
+ * Wrapper node: {@link ICombiner}
  */
-public class CombinerStatement<I, O> extends Statement<I, O> {
+public class CombinerNode<I, O> extends Node<I, O> {
 	protected ICombiner<I, O> combiner;
 	protected IInput<I> input1;
 	protected IInput<I> input2;
 	protected IOutput<O> output;
 
 	/**
-	 * Non-null combiner is not accepted.
+	 * Null combiner is not accepted.
 	 */
-	public CombinerStatement(ICombiner<I, O> combiner) {
+	public CombinerNode(ICombiner<I, O> combiner) {
 		this.combiner = combiner;
 
 		this.input1 = new IInput<>(this);
