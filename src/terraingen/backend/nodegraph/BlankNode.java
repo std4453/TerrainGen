@@ -10,8 +10,6 @@ public class BlankNode<V> extends Node<V, V> {
 	public BlankNode() {
 		this.input = new InputPort<>(this);
 		this.output = new OutputPort<>(this);
-		this.inputCollection.add(this.input);
-		this.outputCollection.add(this.output);
 	}
 
 	@Override

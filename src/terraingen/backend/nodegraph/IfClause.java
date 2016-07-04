@@ -40,8 +40,6 @@ public class IfClause<I, O> extends Node<I, O> implements IProcessorLike<I, O> {
 		// external input & output
 		this.input = new InputPort<>(this);
 		this.output = new OutputPort<>(this);
-		this.inputCollection.add(this.input);
-		this.outputCollection.add(this.output);
 	}
 
 	@Override

@@ -48,4 +48,24 @@ public abstract class Node<I, O> {
 	public void execute() {
 		this.executed = true;
 	}
+
+	/**
+	 * Internal method, called only by {@link InputPort}
+	 *
+	 * @param input
+	 * 		{@link InputPort} to add
+	 */
+	protected void addInput(InputPort<I> input) {
+		this.inputCollection.add(input);
+	}
+
+	/**
+	 * Internal method, called only by {@link OutputPort}
+	 *
+	 * @param output
+	 * 		{@link OutputPort} to add
+	 */
+	protected void addOutput(OutputPort<O> output) {
+		this.outputCollection.add(output);
+	}
 }

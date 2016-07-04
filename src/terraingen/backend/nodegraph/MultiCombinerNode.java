@@ -14,11 +14,8 @@ public class MultiCombinerNode<I, O> extends Node<I, O> {
 		this.multiCombiner = multiCombiner;
 
 		this.output = new OutputPort<>(this);
-		this.outputCollection.add(this.output);
-		for (int i = 0; i < inputCount; ++i) {
-			InputPort<I> input = new InputPort<>(this);
-			this.inputCollection.add(input);
-		}
+		for (int i = 0; i < inputCount; ++i)
+			new InputPort<>(this);
 	}
 
 	public InputPort<I> getInput(int n) {

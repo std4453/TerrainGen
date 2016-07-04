@@ -13,8 +13,6 @@ public class ProcessorNode<I, O> extends Node<I, O> {
 
 		this.input = new InputPort<>(this);
 		this.output = new OutputPort<>(this);
-		this.inputCollection.add(this.input);
-		this.outputCollection.add(this.output);
 	}
 
 	public InputPort<I> getInput() {

@@ -7,8 +7,16 @@ public class InputPort<I> {
 	protected final Node<I, ?> parent;
 	protected Edge<I> outEdge;
 
+	/**
+	 * Automatically add port to input collection
+	 *
+	 * @param parent
+	 * 		Parent {@link Node}
+	 */
 	public InputPort(Node<I, ?> parent) {
 		this.parent = parent;
+		if (parent != null)
+			parent.addInput(this);
 	}
 
 	public Node<I, ?> getParent() {

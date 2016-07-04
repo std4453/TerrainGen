@@ -42,8 +42,6 @@ public class Statement<I, O> extends Node<I, O> implements IProcessorLike<I, O> 
 		// input & output for external access
 		this.input = new InputPort<>(this);
 		this.output = new OutputPort<>(this);
-		this.inputCollection.add(this.input);
-		this.outputCollection.add(this.output);
 
 		// input & output for internal access
 		this.head = new BlankNode<>();

@@ -13,11 +13,8 @@ public class DisassemblerNode<I, O> extends Node<I, O> {
 		this.disassembler = disassembler;
 
 		this.input = new InputPort<>(this);
-		this.inputCollection.add(this.input);
-		for (int i = 0; i < outputCount; ++i) {
-			OutputPort<O> output = new OutputPort<>(this);
-			this.outputCollection.add(output);
-		}
+		for (int i = 0; i < outputCount; ++i)
+			new OutputPort<>(this);
 	}
 
 	public InputPort<I> getInput() {

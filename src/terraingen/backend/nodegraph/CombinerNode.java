@@ -18,9 +18,6 @@ public class CombinerNode<I, O> extends Node<I, O> {
 		this.input1 = new InputPort<>(this);
 		this.input2 = new InputPort<>(this);
 		this.output = new OutputPort<>(this);
-		this.inputCollection.add(this.input1);
-		this.inputCollection.add(this.input2);
-		this.outputCollection.add(this.output);
 	}
 
 	public InputPort<I> getInput1() {

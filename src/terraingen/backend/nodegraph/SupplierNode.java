@@ -16,7 +16,6 @@ public class SupplierNode<O> extends Node<Object, O> {
 		this.supplier = supplier;
 
 		this.output = new OutputPort<>(this);
-		this.outputCollection.add(this.output);
 	}
 
 	public OutputPort<O> getOutput() {
