@@ -2,8 +2,6 @@
 
 TerrainGen is a playground of mine created when I read bunches of documents about procedural random terrain generation and finally decided to implement the algorithms by myself using *Java*, while, in the same time, giving a training to my Java skills.
 
----
-
 # Algorithms
 
 Though the repository will finally contain many different PRTG algorithms, I shall start everything from an algorighm decribed in [this post][algorithm-1]:
