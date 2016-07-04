@@ -18,9 +18,9 @@ public class CombinerStatement<I, O> extends Statement<I, O> {
 		this.input1 = new IInput<>(this);
 		this.input2 = new IInput<>(this);
 		this.output = new IOutput<>(this);
-		this.inputCollection.add(input1);
-		this.inputCollection.add(input2);
-		this.outputCollection.add(output);
+		this.inputCollection.add(this.input1);
+		this.inputCollection.add(this.input2);
+		this.outputCollection.add(this.output);
 	}
 
 	public IInput<I> getInput1() {
@@ -41,7 +41,7 @@ public class CombinerStatement<I, O> extends Statement<I, O> {
 
 		I input1 = this.input1.getOutEdge().getValue();
 		I input2 = this.input2.getOutEdge().getValue();
-		O output = combiner.combine(input1, input2);
+		O output = this.combiner.combine(input1, input2);
 		this.output.getInEdge().setValue(output);
 	}
 }

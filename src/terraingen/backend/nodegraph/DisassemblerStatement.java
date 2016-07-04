@@ -13,7 +13,7 @@ public class DisassemblerStatement<I, O> extends Statement<I, O> {
 		this.disassembler = disassembler;
 
 		this.input = new IInput<>(this);
-		this.inputCollection.add(input);
+		this.inputCollection.add(this.input);
 		for (int i = 0; i < outputCount; ++i) {
 			IOutput<O> output = new IOutput<>(this);
 			this.outputCollection.add(output);

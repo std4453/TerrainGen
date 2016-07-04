@@ -14,7 +14,7 @@ public class MultiCombinerStatement<I, O> extends Statement<I, O> {
 		this.multiCombiner = multiCombiner;
 
 		this.output = new IOutput<>(this);
-		this.outputCollection.add(output);
+		this.outputCollection.add(this.output);
 		for (int i = 0; i < inputCount; ++i) {
 			IInput<I> input = new IInput<>(this);
 			this.inputCollection.add(input);

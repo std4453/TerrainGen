@@ -21,7 +21,7 @@ public class ClauseTest2 {
 				new IDisassembler<Integer, Integer>() {
 					@Override
 					public List<Integer> disassemble(Integer input) {
-						return Arrays.asList(new Integer[]{input, input + 1});
+						return Arrays.asList(input, input + 1);
 					}
 				}, 2);
 		CombinerStatement<Integer, Integer> s3 = new CombinerStatement<>(

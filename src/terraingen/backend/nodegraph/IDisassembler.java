@@ -7,5 +7,5 @@ import java.util.List;
  * class K
  */
 public interface IDisassembler<I, O> {
-	public List<O> disassemble(I input);
+	List<O> disassemble(I input);
 }

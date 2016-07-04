@@ -80,8 +80,11 @@ public class Clause<I, O> extends Statement<I, O> implements IProcessorLike<I, O
 				this.suppliers.add((SupplierStatement) statement);
 
 			if (statement != this.head) {
-				List<IInput<?>> inputs = statement.getInputs();
-				for (IInput input : inputs) {
+				List inputs = statement.getInputs();
+				for (Object inputObj : inputs) {
+					if (!(inputObj instanceof IInput))
+						continue;
+					IInput<?> input = (IInput) inputObj;
 					this.edges.add(input.getOutEdge());
 					Statement ancestor = input.getOutEdge().getOutput().getParent();
 					if (!this.statements.contains(ancestor)) {
@@ -115,12 +118,16 @@ public class Clause<I, O> extends Statement<I, O> implements IProcessorLike<I, O
 	 */
 	protected boolean isStatementReady(Statement statement) {
 		boolean statementReady = true;
-		List<IInput<?>> inputList = statement.getInputs();
-		for (IInput<?> input : inputList)
+		List inputList = statement.getInputs();
+		for (Object inputObj : inputList) {
+			if (!(inputObj instanceof IInput))
+				continue;
+			IInput<?> input = (IInput) inputObj;
 			if (input.getOutEdge() == null || !input.getOutEdge().isValueSet()) {
 				statementReady = false;
 				break;
 			}
+		}
 		
 		return statementReady;
 	}
@@ -158,8 +165,11 @@ public class Clause<I, O> extends Statement<I, O> implements IProcessorLike<I, O
 
 			// add its descendants to the queue, if, it is not the final one
 			if (statement != this.tail) {
-				List<IOutput<?>> outputs = statement.getOutputs();
-				for (IOutput<?> output : outputs) {
+				List outputs = statement.getOutputs();
+				for (Object outputObj : outputs) {
+					if (!(outputObj instanceof IOutput))
+						continue;
+					IOutput<?> output = (IOutput) outputObj;
 					if (output.getInEdge() == null) {
 						log.warn("Output should have an edge.");
 						continue;

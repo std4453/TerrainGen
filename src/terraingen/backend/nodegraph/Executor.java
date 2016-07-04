@@ -38,7 +38,7 @@ public class Executor {
 	 * occurs on the {@link Statement}, errors may occur, therefore this method should
 	 * be called with a {@link Statement} as input only when the {@link Statement}
 	 * wouldn't be changed in any case.<br />
-	 * ( Threotically interface {@link IProcessorLike} should be implemented by an
+	 * ( Theoretically interface {@link IProcessorLike} should be implemented by an
 	 * subclass of {@link Statement}, though there is no technical way to ensure this )
 	 *
 	 * @param statement
