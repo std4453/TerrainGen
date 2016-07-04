@@ -28,9 +28,11 @@ public class IfClauseTest {
 						return String.format("%s is an odd number", input);
 					}
 				});
-		IfClause<Integer, String> ifClause = new IfClause<>(new Clause<>(conditioner), new
-				Clause<>(route1), new Clause<>(route2));
-		for (int i = 0; i < 10; ++i) {
+		IfClause<Integer, String> ifClause = new IfClause<>(
+				new Clause<>(conditioner.getInput(), conditioner.getOutput()),
+				new Clause<>(route1.getInput(), route1.getOutput()),
+				new Clause<>(route2.getInput(), route2.getOutput()));
+		for (int i = 1; i <= 10; ++i) {
 			System.out.println(String.format("Input number %d:", i));
 			String output = Executor.execute(ifClause, i);
 			System.out.println(output);
