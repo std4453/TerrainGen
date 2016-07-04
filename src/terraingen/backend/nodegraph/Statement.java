@@ -18,7 +18,7 @@ import java.util.Queue;
  * <li>There is only one input and one output ( while multiple input & output can be
  * achieved using arrays or other collections )</li>
  * <li>No loop should be formed in a statement ( Loops are achieved using
- * {@link LoopStatement} )</li>
+ * {@link ForClause} )</li>
  * </ol>
  * Therefore anyone who makes a structure with {@code Statement} should be aware of these
  * rules, while no further check is done while the structure is being built.
@@ -69,6 +69,18 @@ public class Statement<I, O> extends Node<I, O> implements IProcessorLike<I, O> 
 		this(statement.getInput(), statement.getOutput());
 	}
 
+	/**
+	 * Convenient constructor to generate a {@code Statement} wrapping a given node, uses
+	 * first input and output port of the given node.<br />
+	 * An exception will be thrown if node has no input or output.
+	 *
+	 * @param node
+	 * 		Node around which to wrap {@code Statement}
+	 */
+	public Statement(Node<I, O> node) {
+		this(node.getInputs().get(0), node.getOutputs().get(0));
+	}
+
 	protected void buildCaches() {
 		Queue<Node> queue = new ArrayDeque<>();
 		queue.offer(this.tail);
@@ -95,7 +107,7 @@ public class Statement<I, O> extends Node<I, O> implements IProcessorLike<I, O> 
 			}
 		}
 	}
-	
+
 	/**
 	 * Calls {@code clearValue()} of every edge of nodes in this statement and
 	 * {@code clearExecuted()} of every statement ( except for {@code this.head} &
@@ -128,10 +140,10 @@ public class Statement<I, O> extends Node<I, O> implements IProcessorLike<I, O> 
 				break;
 			}
 		}
-		
+
 		return nodeReady;
 	}
-	
+
 	@Override
 	public void execute() {
 		super.execute();
