@@ -121,44 +121,15 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 			final double l = y0;
 
 			double x, y;
-//			if (y2 == y0) {
-//				x = y2;
-//				y = y0 - Math.pow(x2 - x1, 2) / (y0 - y1) / 2;
-//			} else
-//
-//			{
-//				final double k = Math.sqrt((y0 - y1) / (y0 - y2));
-//				x = (x1 + k * x2) / (1 + k);
-//				y = y0 - Math.pow(x2 - x1, 2) / (y0 - y2) / Math.pow(1 + k, 2) / 2;
-//			}
+			if (y2 == y0) {
+				x = y2;
+				y = y0 - Math.pow(x2 - x1, 2) / (y0 - y1) / 2;
+			} else
 
-			if (s1.y == s2.y) {
-				x = (s1.x + s2.x) / 2; // x coordinate is between the two sites
-				// comes from parabola focus-directrix definition:
-				y = (sq(x - s1.x) + sq(s1.y) - sq(l)) / (2 * (s1.y - l));
-			} else {
-				// This method works by intersecting the line of the edge with the parabola of the higher point
-				// I'm not sure why I chose the higher point, either should work
-				double px = (s1.y > s2.y) ? s1.x : s2.x;
-				double py = (s1.y > s2.y) ? s1.y : s2.y;
-				double m = -1.0 / ((s1.y - s2.y) / (s1.x - s2.x));
-				double b = (y1 + y2) / 2 - m * (x1 + x2) / 2;
-
-				double d = 2 * (py - l);
-
-				// Straight up quadratic formula
-				double A = 1;
-				double B = -2 * px - d * m;
-				double C = sq(px) + sq(py) - sq(l) - d * b;
-				int sign = (s1.y > s2.y) ? -1 : 1;
-				double det = sq(B) - 4 * A * C;
-				// When rounding leads to a very very small negative determinant, fix it
-				if (det <= 0) {
-					x = -B / (2 * A);
-				} else {
-					x = (-B + sign * Math.sqrt(det)) / (2 * A);
-				}
-				y = m * x + b;
+			{
+				final double k = Math.sqrt((y0 - y1) / (y0 - y2));
+				x = (x1 + k * x2) / (1 + k);
+				y = y0 - Math.pow(x2 - x1, 2) / (y0 - y2) / Math.pow(1 + k, 2) / 2;
 			}
 
 			return new Point(x, y);
