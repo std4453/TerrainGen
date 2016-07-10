@@ -19,7 +19,7 @@ import java.awt.image.BufferedImage;
  */
 public class FortuneTest {
 	public static void main(String[] args) {
-		final int points = 20;
+		final int points = 5;
 		final long seed = 10;
 		final Boundaries boundaries = new Boundaries(0, 100, 0, 100);
 

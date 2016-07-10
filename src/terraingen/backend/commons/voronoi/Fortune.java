@@ -11,6 +11,14 @@ import java.util.*;
  * FIXME: JUST LET THE ERRORS BE THERE
  */
 public class Fortune implements IProcessor<PointBox, VoronoiBox> {
+	private static double square(double n) {
+		return n * n;
+	}
+
+	private static double abs(double n) {
+		return n > 0 ? n : -n;
+	}
+
 	protected static class Arc implements Comparable<Arc> {
 		public BreakPoint left, right;
 		public Point site;
@@ -108,28 +116,29 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 			this.right = right;
 		}
 
-		private static final double sq(double n) {
-			return n * n;
-		}
-
 		public Point getPoint() {
 			final Point s1 = this.left.site;
 			final Point s2 = this.right.site;
 			final double x1 = s1.x, x2 = s2.x;
 			final double y1 = s1.y, y2 = s2.y;
 			final double y0 = this.context.sweepLine;
-			final double l = y0;
 
 			double x, y;
-			if (y2 == y0) {
-				x = y2;
-				y = y0 - Math.pow(x2 - x1, 2) / (y0 - y1) / 2;
-			} else
+			if (y1 == y2) {
+				x = (x1 + x2) / 2;
+				y = (y0 + y1) / 2 - (y0 - y1) * square(x1 - x2) / 8;
+			} else {
+				final double a = y1 - y2;
+				final double b = 2 * ((y2 * x1 - y1 * x2) + y0 * (x2 - x1));
+				final double c = (y0 - y1) * (y1 - y2) * (y2 - y0) + (square(
+						x2) * y1 - square(x1) * y2) + y0 * (square(x1) - square(x2));
+				final double delta = square(b) - 4 * a * c;
+				final double sqrtDelta = delta < 1e-3 ? 0 : Math.sqrt(square(b) - 4 * a *
+						c);
+				final double axis = -b / a / 2;
 
-			{
-				final double k = Math.sqrt((y0 - y1) / (y0 - y2));
-				x = (x1 + k * x2) / (1 + k);
-				y = y0 - Math.pow(x2 - x1, 2) / (y0 - y2) / Math.pow(1 + k, 2) / 2;
+				x = y1 > y2 ? (axis + sqrtDelta) : (axis - sqrtDelta);
+				y = (y1 + y2) / 2 + (x1 - x2) * (x1 + x2 - 2 * x) / 2 / (y1 - y2);
 			}
 
 			return new Point(x, y);
@@ -282,11 +291,11 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 
 	protected void handleSiteEvent(Context context, SiteEvent event) {
 		System.out.println("Site event: " + event.site.x + "," + event.site.y);
-//		System.out.println("Beach line:");
-//		for (Arc arc : context.beachLine)
-//			System.out.println(
-//					"\t" + arc.getLeftX() + " ~ " + arc.getRightX() + "  site: " +
-//							"" + arc.site.x + "," + arc.site.y);
+		System.out.println("Beach line:");
+		for (Arc arc : context.beachLine)
+			System.out.println(
+					"\t" + arc.getLeftX() + " ~ " + arc.getRightX() + "  site: " +
+							"" + arc.site.x + "," + arc.site.y);
 
 		TreeSet<Arc> beachLine = context.beachLine;
 
@@ -328,9 +337,9 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 		context.breakPoints.add(breakL);
 		context.breakPoints.add(breakR);
 		beachLine.remove(above);
-		beachLine.add(newLeft);
-		beachLine.add(newCenter);
-		beachLine.add(newRight);
+		System.out.println(beachLine.add(newLeft));
+		System.out.println(beachLine.add(newCenter));
+		System.out.println(beachLine.add(newRight));
 
 		// new edge
 
