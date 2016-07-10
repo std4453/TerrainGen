@@ -41,6 +41,19 @@ public class VoronoiBox extends PointBox {
 		this.voronoiPoints = points;
 	}
 
+	// DEBUG HACK START
+	public List<List<Fortune.Parabola>> beachLines;
+	public List<Point> circleEvents;
+
+	public VoronoiBox(Boundaries boundaries, List<Point> sites, List<Edge> edges,
+					  List<Cell> cells, List<Point> points, List<List<Fortune
+			.Parabola>> beachlines, List<Point> circleEvents) {
+		this(boundaries, sites, edges, cells, points);
+		this.beachLines = beachlines;
+		this.circleEvents = circleEvents;
+	}
+	// DEBUG HACK END
+
 	public List<Edge> getEdges() {
 		return this.edges;
 	}

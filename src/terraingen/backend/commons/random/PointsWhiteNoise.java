@@ -24,7 +24,6 @@ public class PointsWhiteNoise implements IProcessor<Long, PointBox>,
 	}
 
 	@Override
-
 	public PointBox process(Long seed) {
 		Random random = new Random(seed);
 		double width = this.boundaries.right - this.boundaries.left;

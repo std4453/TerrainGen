@@ -133,11 +133,13 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 				final double c = (y0 - y1) * (y1 - y2) * (y2 - y0) + (square(
 						x2) * y1 - square(x1) * y2) + y0 * (square(x1) - square(x2));
 				final double delta = square(b) - 4 * a * c;
-				final double sqrtDelta = delta < 1e-3 ? 0 : Math.sqrt(square(b) - 4 * a *
-						c);
+				double sqrtDelta = delta < 1e-3 ? 0 : Math.sqrt(delta);
+				sqrtDelta /= a * 2;
 				final double axis = -b / a / 2;
 
-				x = y1 > y2 ? (axis + sqrtDelta) : (axis - sqrtDelta);
+//				x = y1 > y2 ? (axis + sqrtDelta) : (axis - sqrtDelta);
+				x = axis + sqrtDelta;
+//				x = axis - sqrtDelta;
 				y = (y1 + y2) / 2 + (x1 - x2) * (x1 + x2 - 2 * x) / 2 / (y1 - y2);
 			}
 
@@ -225,6 +227,11 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 		public HashSet<BreakPoint> breakPoints;
 		public double sweepLine;
 
+		// DEBUG HACK START
+		public List<List<Parabola>> cachedBeachLines;
+		public List<Point> circleEventPoints;
+		// DEBUG HACK END
+
 		public Map<Point, VoronoiBox.Cell> cells;
 		public List<Point> voronoiPoints;
 		public List<VoronoiBox.Edge> edges;
@@ -239,6 +246,11 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 			this.cells = new HashMap<>();
 			this.voronoiPoints = new Vector<>();
 			this.edges = new Vector<>();
+
+			// DEBUG HACK START
+			this.cachedBeachLines = new Vector<>();
+			this.circleEventPoints = new Vector<>();
+			// DEBUG HACK END
 		}
 
 		public void setSweepLine(double sweepLine) {
@@ -267,10 +279,15 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 			Point position = event.getPoint();
 			context.setSweepLine(position.y);
 
-			if (event.isSiteEvent())
+			if (event.isSiteEvent()) {
 				this.handleSiteEvent(context, (SiteEvent) event);
-			else
+				cacheBeachLine(context);
+			} else {
+				context.circleEventPoints.add(event.getPoint());
 				this.handleCircleEvent(context, (CircleEvent) event);
+//				if (!((CircleEvent) event).removed)
+//					cacheBeachLine(context);
+			}
 		}
 
 		// generate VoronoiBox
@@ -283,19 +300,24 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 				breakPoint.finish();
 			voronoiPoints.add(breakPoint.finalPoint);
 		}
-		VoronoiBox voronoiBox = new VoronoiBox(boundaries, points, context.edges,
-				cells, voronoiPoints);
+//		VoronoiBox voronoiBox = new VoronoiBox(boundaries, points, context.edges,
+//		cells, voronoiPoints);
+
+		// DEBUG HACK START
+		VoronoiBox voronoiBox = new VoronoiBox(boundaries, points, context.edges, cells,
+				voronoiPoints, context.cachedBeachLines, context.circleEventPoints);
+		// DEBUG HACK END
 
 		return voronoiBox;
 	}
 
 	protected void handleSiteEvent(Context context, SiteEvent event) {
 		System.out.println("Site event: " + event.site.x + "," + event.site.y);
-		System.out.println("Beach line:");
-		for (Arc arc : context.beachLine)
-			System.out.println(
-					"\t" + arc.getLeftX() + " ~ " + arc.getRightX() + "  site: " +
-							"" + arc.site.x + "," + arc.site.y);
+//		System.out.println("Beach line:");
+//		for (Arc arc : context.beachLine)
+//			System.out.println(
+//					"\t" + arc.getLeftX() + " ~ " + arc.getRightX() + "  site: " +
+//							"" + arc.site.x + "," + arc.site.y);
 
 		TreeSet<Arc> beachLine = context.beachLine;
 
@@ -337,9 +359,9 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 		context.breakPoints.add(breakL);
 		context.breakPoints.add(breakR);
 		beachLine.remove(above);
-		System.out.println(beachLine.add(newLeft));
-		System.out.println(beachLine.add(newCenter));
-		System.out.println(beachLine.add(newRight));
+		beachLine.add(newLeft);
+		beachLine.add(newCenter);
+		beachLine.add(newRight);
 
 		// new edge
 
@@ -400,15 +422,17 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 		final Point s1 = arc.left.left.site;
 		final Point s2 = arc.site;
 		final Point s3 = arc.right.right.site;
+		if ((s2.x - s1.x) * (s3.y - s1.y) - (s2.y - s1.y) * (s3.x - s1.x) <= 0)
+			return;
 		final double x1 = s1.x, x2 = s2.x, x3 = s3.x;
 		final double y1 = s1.y, y2 = s2.y, y3 = s3.y;
 		final double
-				a = y2 - y1,
-				b = x2 - x1,
-				c = y3 - y2,
-				d = x3 - x2,
-				e = (y2 - y1) / 2 * (y1 + y2 - x1 - x2),
-				f = (y3 - y2) / 2 * (y3 + y2 - x3 - x2);
+				a = x2 - x1,
+				b = y2 - y1,
+				c = x3 - x2,
+				d = y3 - y2,
+				e = (y2 * y2 - y1 * y1 + x2 * x2 - x1 * x1) / 2,
+				f = (y3 * y3 - y2 * y2 + x3 * x3 - x2 * x2) / 2;
 		final double epsilon = 1e-3;
 		final double matD = a * d - c * b;
 
@@ -419,14 +443,36 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 		// ( x , y ) is the circle center
 
 		// calculate the position of the circle event
-		final double dist = Math.sqrt(Math.pow(x - x2, 2) + Math.pow(y - y2, 2));
+		final double dist = Math.sqrt(square(x - x2) + square(y - y2));
+//		System.out.println("Possible circle event: " + x + "," + y + dist);
 		Point eventPoint = new Point(x, y + dist);
-		if (eventPoint.y < context.sweepLine)
-			return;
+//		if (eventPoint.y < context.sweepLine)
+//			return;
 
 		// add circle event
 		CircleEvent event = new CircleEvent(arc, eventPoint);
 		context.eventQueue.offer(event);
 		arc.setCircleEvent(event);
+	}
+
+	private void cacheBeachLine(Context context) {
+		List<Parabola> parabolas = new Vector<>();
+		for (Arc arc : context.beachLine)
+			parabolas.add(new Parabola(arc.site, context.sweepLine, arc.getLeftX(), arc
+					.getRightX()));
+		context.cachedBeachLines.add(parabolas);
+	}
+
+	public static class Parabola {
+		public Point focus;
+		public double directrix;
+		public double left, right;
+
+		public Parabola(Point focus, double directrix, double left, double right) {
+			this.focus = focus;
+			this.directrix = directrix;
+			this.left = left;
+			this.right = right;
+		}
 	}
 }
