@@ -44,13 +44,16 @@ public class VoronoiBox extends PointBox {
 	// DEBUG HACK START
 	public List<List<Fortune.Parabola>> beachLines;
 	public List<Point> circleEvents;
+	public List<Fortune.CircleEvent> circleEvents2;
 
 	public VoronoiBox(Boundaries boundaries, List<Point> sites, List<Edge> edges,
 					  List<Cell> cells, List<Point> points, List<List<Fortune
-			.Parabola>> beachlines, List<Point> circleEvents) {
+			.Parabola>> beachlines, List<Point> circleEvents, List<Fortune.CircleEvent>
+							  circleEvents2) {
 		this(boundaries, sites, edges, cells, points);
 		this.beachLines = beachlines;
 		this.circleEvents = circleEvents;
+		this.circleEvents2 = circleEvents2;
 	}
 	// DEBUG HACK END
 

@@ -41,6 +41,8 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 
 		@Override
 		public int compareTo(Arc o) {
+			if (this == o)
+				return 0;
 			if (this instanceof ArcQuery && o instanceof ArcQuery)
 				return Double.compare(((ArcQuery) this).query, ((ArcQuery) o).query);
 			if (this instanceof ArcQuery)
@@ -230,6 +232,7 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 		// DEBUG HACK START
 		public List<List<Parabola>> cachedBeachLines;
 		public List<Point> circleEventPoints;
+		public List<CircleEvent> circleEvents;
 		// DEBUG HACK END
 
 		public Map<Point, VoronoiBox.Cell> cells;
@@ -250,6 +253,7 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 			// DEBUG HACK START
 			this.cachedBeachLines = new Vector<>();
 			this.circleEventPoints = new Vector<>();
+			this.circleEvents = new Vector<>();
 			// DEBUG HACK END
 		}
 
@@ -305,7 +309,8 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 
 		// DEBUG HACK START
 		VoronoiBox voronoiBox = new VoronoiBox(boundaries, points, context.edges, cells,
-				voronoiPoints, context.cachedBeachLines, context.circleEventPoints);
+				voronoiPoints, context.cachedBeachLines, context.circleEventPoints,
+				context.circleEvents);
 		// DEBUG HACK END
 
 		return voronoiBox;
@@ -313,11 +318,11 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 
 	protected void handleSiteEvent(Context context, SiteEvent event) {
 		System.out.println("Site event: " + event.site.x + "," + event.site.y);
-//		System.out.println("Beach line:");
-//		for (Arc arc : context.beachLine)
-//			System.out.println(
-//					"\t" + arc.getLeftX() + " ~ " + arc.getRightX() + "  site: " +
-//							"" + arc.site.x + "," + arc.site.y);
+		System.out.println("Beach line:");
+		for (Arc arc : context.beachLine)
+			System.out.println(
+					"\t" + arc.getLeftX() + " ~ " + arc.getRightX() + "  site: " +
+							"" + arc.site.x + "," + arc.site.y);
 
 		TreeSet<Arc> beachLine = context.beachLine;
 
@@ -383,7 +388,7 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 		TreeSet<Arc> beachLine = context.beachLine;
 
 		// remove arc
-		beachLine.remove(target);
+		System.out.println(beachLine.remove(target));
 
 		// false alarms
 		BreakPoint targetL = target.left;
@@ -453,6 +458,13 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 		CircleEvent event = new CircleEvent(arc, eventPoint);
 		context.eventQueue.offer(event);
 		arc.setCircleEvent(event);
+
+		// DEBUG HACK START
+		CircleEvent event2 = new CircleEvent(arc, new Point(x, y));
+		context.circleEvents.add(event2);
+		System.out.println(
+				String.format("%f, %f | %f, %f | %f, %f", x1, y1, x2, y2, x3, y3));
+		// DEBUG HACK END
 	}
 
 	private void cacheBeachLine(Context context) {

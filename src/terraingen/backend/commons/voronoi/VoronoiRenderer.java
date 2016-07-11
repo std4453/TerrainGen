@@ -13,13 +13,17 @@ import java.awt.image.BufferedImage;
 public class VoronoiRenderer implements IProcessor<VoronoiBox, BufferedImage> {
 	private static final int WIDTH = 600;
 	private static final int HEIGHT = 600;
-	private static final int POINT_SIZE = 5;
+	private static final int POINT_SIZE = 10;
 	private static final int VORONOI_POINT_SIZE = 3;
 
 	protected Point transfer(Boundaries boundaries, Point input) {
 		return new Point((input.x - boundaries.left) / (boundaries.right - boundaries
 				.left) * WIDTH,
 				(input.y - boundaries.top) / (boundaries.bottom - boundaries.top) * HEIGHT);
+	}
+
+	private int round(double n) {
+		return (int) Math.round(n);
 	}
 
 	@Override
@@ -49,13 +53,15 @@ public class VoronoiRenderer implements IProcessor<VoronoiBox, BufferedImage> {
 		g.setColor(Color.RED);
 		for (Point point : input.getPoints()) {
 			Point p = transfer(boundaries, point);
-			g.fillOval((int) p.x, (int) p.y, POINT_SIZE, POINT_SIZE);
+			g.fillOval(round(p.x - (double) POINT_SIZE / 2),
+					round(p.y - (double) POINT_SIZE / 2), POINT_SIZE, POINT_SIZE);
 		}
 		// draw voronoi points
 		g.setColor(Color.BLUE);
 		for (Point point : input.getVoronoiPoints()) {
 			Point p = transfer(boundaries, point);
-			g.fillOval((int) p.x, (int) p.y, VORONOI_POINT_SIZE, VORONOI_POINT_SIZE);
+			g.fillOval(round(p.x - (double) VORONOI_POINT_SIZE / 2), round(p.y - (double)
+					VORONOI_POINT_SIZE / 2), VORONOI_POINT_SIZE, VORONOI_POINT_SIZE);
 		}
 
 //		// DEBUG HACK START
@@ -92,13 +98,34 @@ public class VoronoiRenderer implements IProcessor<VoronoiBox, BufferedImage> {
 //					}
 //					lastPoint = thisPoint;
 //				}
+//
+//				double centerX = parabola.focus.x;
+//				double centerY = (parabola.directrix + parabola.focus.y) / 2;
+//				Point centerPoint = new Point(centerX, centerY);
+//				centerPoint = transfer(boundaries, centerPoint);
+//				Point focusPoint = transfer(boundaries, parabola.focus);
+//				g.drawLine(round(centerPoint.x), round(centerPoint.y), round(focusPoint
+//						.x), round(focusPoint.y));
 //			}
+//		}
+//		// draw circle events
+//		g.setColor(Color.gray);
+//		for (Fortune.CircleEvent ce : input.circleEvents2) {
+//			Point center = ce.getPoint();
+//			center = transfer(boundaries, center);
+//			Point site = ce.target.site;
+//			site = transfer(boundaries, site);
+//			double dist = Math.sqrt(
+//					(center.x - site.x) * (center.x - site.x) + (center.y - site.y) *
+//							(center.y - site.y));
+//			g.drawOval(round(center.x - dist), round(center.y - dist), round(dist * 2),
+//					round(dist * 2));
 //		}
 //		// draw circle event points
 //		g.setColor(Color.MAGENTA);
 //		for (Point point : input.circleEvents) {
 //			Point p = transfer(boundaries, point);
-//			g.fillOval((int) p.x, (int) p.y, 5, 5);
+//			g.fillOval((int) p.x - 3, (int) p.y - 3, 6, 6);
 //		}
 //		// DEBUG HACK END
 
