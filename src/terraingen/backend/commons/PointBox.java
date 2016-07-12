@@ -41,6 +41,10 @@ public class PointBox implements Iterable<Point> {
 		this.points.addAll(points);
 	}
 
+	public void addPoint(Point point) {
+		this.points.add(point);
+	}
+
 	public void removePoints(Point point) {
 		this.points.remove(point);
 	}
