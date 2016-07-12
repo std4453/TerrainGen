@@ -7,21 +7,31 @@ import terraingen.backend.nodegraph.IProcessor;
 
 import java.util.*;
 
-/**
- * FIXME: JUST LET THE ERRORS BE THERE
- */
+import static terraingen.utils.MathUtils.square;
+
 public class Fortune implements IProcessor<PointBox, VoronoiBox> {
-	private static double square(double n) {
-		return n * n;
-	}
-
-	private static double abs(double n) {
-		return n > 0 ? n : -n;
-	}
-
+	/**
+	 * Arc describes a section of a parabola, with two breakpoints ( could be null )
+	 * on its sides. While arcs are contained in a {@link TreeMap}, they are prepared
+	 * according to their midpoint's x coord.<br />
+	 * Arc's subclass {@link ArcQuery} is used to search for the Arc above the site
+	 * event, while {@code compareTo()} finds the arc that "contains" the x position of
+	 * the query.<br /><br />
+	 * The left and right points of {@code Arc} can be modified, and are modified only
+	 * when a <i>circle event</i> happens. When a <i>site event</i> happens, the {@code
+	 * Arc} above the site is actually removed and three new fill in its space.
+	 */
 	protected static class Arc implements Comparable<Arc> {
+		/**
+		 * could be {@code null} when a side of this {@code Arc} extends to infinity (
+		 * when there is no {@code Arc} there to intersect )
+		 */
 		public BreakPoint left, right;
 		public Point site;
+		/**
+		 * null if this {@code Arc} doesn't have an circle event, either there wouldn't
+		 * one or the one of this {@code Arc} is removed.
+		 */
 		public CircleEvent circleEvent;
 
 		public Arc(BreakPoint left, BreakPoint right, Point site) {
@@ -35,26 +45,49 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 		}
 
 		public double getRightX() {
-			return this.right != null ? this.right.getPoint().x : Double
-					.POSITIVE_INFINITY;
+			return this.right != null ? this.right.getPoint().x : Double.POSITIVE_INFINITY;
 		}
 
+		/**
+		 * Compares two arcs.<br />
+		 * {@code Arc a} is same to {@code Arc b}, if and only if:<br />
+		 * <ol>
+		 * <li>{@code a} is the same object with {@code b}</li>
+		 * <li>{@code a} is not {@link ArcQuery} and {@code b} is {@link ArcQuery}
+		 * and range described by {@code a} contains query of {@code b}</li>
+		 * <li>{@code a} and {@code b} are both instances of {@link ArcQuery} and
+		 * they have the same query ( not supposed to happen )</li>
+		 * <li>Range described by {@code a} has the same midpoint with that of
+		 * {@code b} ( not supposed to happen )</li>
+		 * </ol>
+		 *
+		 * @param o
+		 * 		The other Arc
+		 *
+		 * @return Compare result
+		 */
 		@Override
 		public int compareTo(Arc o) {
-			if (this == o)
+			if (this == o)    // same object
 				return 0;
+
 			if (this instanceof ArcQuery && o instanceof ArcQuery)
 				return Double.compare(((ArcQuery) this).query, ((ArcQuery) o).query);
 			if (this instanceof ArcQuery)
 				return -o.compareTo(this);
-			double tl = this.getLeftX(), tr = this.getRightX(), ol = o.getLeftX(), or = o
-					.getRightX();
-			if (o instanceof ArcQuery && tl <= ol && tr >= or)
+			double
+					tl = this.getLeftX(),
+					tr = this.getRightX(),
+					ol = o.getLeftX(),
+					or = o.getRightX();
+			if (o instanceof ArcQuery && tl <= ol && tr >= or)    // contains the query
 				return 0;
+			// quick and simple cases
 			if (tr <= ol)
 				return -1;
 			if (tl >= or)
 				return 1;
+
 			return Double.compare(tl + tr, ol + or);
 		}
 
@@ -71,6 +104,9 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 		}
 	}
 
+	/**
+	 * Used while a site event occurs and finds the {@link Arc} above the site
+	 */
 	protected static class ArcQuery extends Arc {
 		public double query;
 
@@ -90,11 +126,34 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 		}
 	}
 
+	/**
+	 * A {@code BreakPoint} is the intersection of two {@link Arc}{@code s}. The
+	 * existence of a {@code BreakPoint} only means that two {@link Arc}{@code s} on
+	 * the beach line will intersect, while its position is dynamic within the
+	 * execution of the <i>Fortune's Algorithm</i> and only determined when its {@code
+	 * finish()} method is invoked ( when an <i>circle event</i> occurs or the whole
+	 * process is finished and all {@code BreakPoints} are finished ). The trail of a
+	 * {@code BreakPoint} ( from created to finished ) forms an edge in the generated
+	 * voronoi map. Also the position of an {@code BreakPoint} is evaluated dynamically
+	 * according the {@link Arc}{@code s} and the position of the sweep line.<br /><br />
+	 * The {@link Arc}{@code s} of the {@code BreakPoint} are mutable and are modified
+	 * only when an site event occurs.
+	 */
 	protected static class BreakPoint {
+		/**
+		 * Used to access the position of the sweep line
+		 */
 		public Context context;
 		public Arc left, right;
 		public Point finalPoint;
 		public Point beginPoint;
+
+		/**
+		 * Point that stay unchanged when the sweep line stays still. A cache is built
+		 * so that calculations go faster.
+		 */
+		protected Point cachedPoint;
+		protected double cachedSweepLine = Double.NEGATIVE_INFINITY;
 
 		public BreakPoint(Context context, Arc left, Arc right) {
 			this(context);
@@ -104,7 +163,8 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 		}
 
 		/**
-		 * In case {@link Arc} requires {@code BreakPoint} to be instantiated first.
+		 * In case {@link Arc} requires its {@code BreakPoint}{@code s} to be
+		 * instantiated first.
 		 */
 		public BreakPoint(Context context) {
 			this.context = context;
@@ -118,34 +178,43 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 			this.right = right;
 		}
 
+		/**
+		 * calculates the current position of the {@code BreakPoint}
+		 *
+		 * @return the {@code BreakPoint}'s current position
+		 */
 		public Point getPoint() {
+			// resolve cache
+			final double y0 = this.context.sweepLine;
+			if (y0 == this.cachedSweepLine)
+				return this.cachedPoint;
+
 			final Point s1 = this.left.site;
 			final Point s2 = this.right.site;
 			final double x1 = s1.x, x2 = s2.x;
 			final double y1 = s1.y, y2 = s2.y;
-			final double y0 = this.context.sweepLine;
 
 			double x, y;
 			if (y1 == y2) {
+				// when site points of two parabolas have the same y coord then there's
+				// only one intersection point, so it is solved to reduce calculations
 				x = (x1 + x2) / 2;
 				y = (y0 + y1) / 2 - (y0 - y1) * square(x1 - x2) / 8;
 			} else {
+				// math solve of intersection of two parabolas
 				final double a = y1 - y2;
 				final double b = 2 * ((y2 * x1 - y1 * x2) + y0 * (x2 - x1));
 				final double c = (y0 - y1) * (y1 - y2) * (y2 - y0) + (square(
 						x2) * y1 - square(x1) * y2) + y0 * (square(x1) - square(x2));
 				final double delta = square(b) - 4 * a * c;
 				double sqrtDelta = delta < 1e-3 ? 0 : Math.sqrt(delta);
-				sqrtDelta /= a * 2;
-				final double axis = -b / a / 2;
-
-//				x = y1 > y2 ? (axis + sqrtDelta) : (axis - sqrtDelta);
-				x = axis + sqrtDelta;
-//				x = axis - sqrtDelta;
+				x = (sqrtDelta - b) / a / 2;
 				y = (y1 + y2) / 2 + (x1 - x2) * (x1 + x2 - 2 * x) / 2 / (y1 - y2);
 			}
 
-			return new Point(x, y);
+			this.cachedPoint = new Point(x, y);
+			this.cachedSweepLine = y0;
+			return this.cachedPoint;
 		}
 
 		public void begin() {
@@ -158,6 +227,10 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 		}
 	}
 
+	/**
+	 * Subclass of {@link CircleEvent} and {@link SiteEvent}, only to enable them be
+	 * contained within one single {@link PriorityQueue}.
+	 */
 	protected static abstract class Event implements Comparable<Event> {
 		public boolean isSiteEvent() {
 			return this instanceof SiteEvent;
@@ -168,11 +241,13 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 		}
 
 		public double getY() {
-			return 0;
+			return this.getPoint().y;
 		}
 
 		@Override
 		public int compareTo(Event o) {
+			if (this == o)
+				return 0;
 			return Double.compare(this.getY(), o.getY());
 		}
 
@@ -187,18 +262,12 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 		}
 
 		@Override
-		public double getY() {
-			return this.site.y;
-		}
-
-		@Override
 		public Point getPoint() {
 			return this.site;
 		}
 	}
 
 	protected static class CircleEvent extends Event {
-		public boolean removed;
 		public Arc target;
 		public Point position;
 
@@ -207,123 +276,137 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 			this.position = position;
 		}
 
-		public void remove() {
-			this.removed = true;
-		}
-
-		@Override
-		public double getY() {
-			return this.position.y;
-		}
-
 		@Override
 		public Point getPoint() {
 			return this.position;
 		}
 	}
 
+	/**
+	 * Context of the current execution of "Fortune's Algorithm" ( in case {@code
+	 * Fortune.process()} is invoked multi-threaded ). It provides information of the
+	 * current state. A new instance of {@code Context} is created every time {@code
+	 * Fortune.process()} is invoked.
+	 */
 	protected static class Context {
-		public TreeSet<Arc> beachLine;
+		// original content
+		public PointBox pointBox;
+		public Boundaries boundaries;
 		public List<Point> points;
+
+		// fortune's algorithm
+		public double sweepLine;
+		public TreeSet<Arc> beachLine;
 		public PriorityQueue<Event> eventQueue;
 		public HashSet<BreakPoint> breakPoints;
-		public double sweepLine;
 
-		// DEBUG HACK START
-		public List<List<Parabola>> cachedBeachLines;
-		public List<Point> circleEventPoints;
-		public List<CircleEvent> circleEvents;
-		// DEBUG HACK END
-
+		// voronoi map
 		public Map<Point, VoronoiBox.Cell> cells;
 		public List<Point> voronoiPoints;
 		public List<VoronoiBox.Edge> edges;
 
-		public Context(List<Point> points) {
+		public Context(PointBox pointBox) {
+			// process input
+			this.pointBox = pointBox;
+			this.boundaries = pointBox.getBoundaries();
+			this.points = pointBox.getPoints();
+
+			// initialize data structures
 			this.beachLine = new TreeSet<>();
-			this.points = points;
 			this.eventQueue = new PriorityQueue<>();
 			this.breakPoints = new HashSet<>();
-			this.sweepLine = 0;
 
+			// data for voronoi box
 			this.cells = new HashMap<>();
 			this.voronoiPoints = new Vector<>();
 			this.edges = new Vector<>();
-
-			// DEBUG HACK START
-			this.cachedBeachLines = new Vector<>();
-			this.circleEventPoints = new Vector<>();
-			this.circleEvents = new Vector<>();
-			// DEBUG HACK END
 		}
 
 		public void setSweepLine(double sweepLine) {
 			this.sweepLine = sweepLine;
 		}
-
 	}
 
+	/**
+	 * Main process of the Fortune's Algorithm, see
+	 * <a href="https://en.wikipedia.org/wiki/Fortune's_Algorithm"><i>Fortune's
+	 * Algorithm on Wikipedia</i></a> for more detail.
+	 *
+	 * @param input
+	 * 		{@link PointBox}
+	 *
+	 * @return {@link VoronoiBox}
+	 */
 	@Override
 	public VoronoiBox process(PointBox input) {
-		List<Point> points = input.getPoints();
-		Context context = new Context(points);
-		PriorityQueue<Event> eventQueue = context.eventQueue;
+		Context context = new Context(input);
 
+		preProcess(context);
+
+		List<Point> points = context.points;
+		PriorityQueue<Event> eventQueue = context.eventQueue;
 		// add all site events to queue
 		for (Point point : points)
 			eventQueue.offer(new SiteEvent(point));
+		// loop
+		while (!eventQueue.isEmpty()) {
+			Event event = eventQueue.poll();
+			context.setSweepLine(event.getY());
 
+			if (event.isSiteEvent())
+				this.handleSiteEvent(context, (SiteEvent) event);
+			else
+				this.handleCircleEvent(context, (CircleEvent) event);
+		}
+
+		return postProcess(context);
+	}
+
+	/**
+	 * Pre-process stage: initialize voronoi map
+	 *
+	 * @param context
+	 * 		Current Context
+	 */
+	protected void preProcess(Context context) {
+		List<Point> points = context.points;
 		// add all cells
 		for (Point point : points)
 			context.cells.put(point, new VoronoiBox.Cell(point));
+	}
 
-		// main loop
-		while (!eventQueue.isEmpty()) {
-			Event event = eventQueue.poll();
-			Point position = event.getPoint();
-			context.setSweepLine(position.y);
-
-			if (event.isSiteEvent()) {
-				this.handleSiteEvent(context, (SiteEvent) event);
-				cacheBeachLine(context);
-			} else {
-				context.circleEventPoints.add(event.getPoint());
-				this.handleCircleEvent(context, (CircleEvent) event);
-//				if (!((CircleEvent) event).removed)
-//					cacheBeachLine(context);
-			}
-		}
-
-		// generate VoronoiBox
-		Boundaries boundaries = input.getBoundaries();
+	/**
+	 * Post-process stage: construct {@link VoronoiBox}
+	 *
+	 * @param context
+	 * 		Current context
+	 *
+	 * @return Constructed {@link VoronoiBox}
+	 */
+	protected VoronoiBox postProcess(Context context) {
 		List<VoronoiBox.Cell> cells = new Vector<>();
 		cells.addAll(context.cells.values());
+
 		List<Point> voronoiPoints = new Vector<>();
 		for (BreakPoint breakPoint : context.breakPoints) {
 			if (breakPoint.finalPoint == null)
 				breakPoint.finish();
 			voronoiPoints.add(breakPoint.finalPoint);
 		}
-//		VoronoiBox voronoiBox = new VoronoiBox(boundaries, points, context.edges,
-//		cells, voronoiPoints);
 
-		// DEBUG HACK START
-		VoronoiBox voronoiBox = new VoronoiBox(boundaries, points, context.edges, cells,
-				voronoiPoints, context.cachedBeachLines, context.circleEventPoints,
-				context.circleEvents);
-		// DEBUG HACK END
-
-		return voronoiBox;
+		return new VoronoiBox(context.boundaries, context.points, context.edges,
+				cells, voronoiPoints);
 	}
 
+	/**
+	 * Handle <i>site event</i>
+	 *
+	 * @param context
+	 * 		Current context
+	 * @param event
+	 * 		Site event
+	 */
 	protected void handleSiteEvent(Context context, SiteEvent event) {
-		System.out.println("Site event: " + event.site.x + "," + event.site.y);
-		System.out.println("Beach line:");
-		for (Arc arc : context.beachLine)
-			System.out.println(
-					"\t" + arc.getLeftX() + " ~ " + arc.getRightX() + "  site: " +
-							"" + arc.site.x + "," + arc.site.y);
-
 		TreeSet<Arc> beachLine = context.beachLine;
 
 		// first site event
@@ -335,27 +418,27 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 		// find arc above site
 		Arc above = beachLine.floor(new ArcQuery(event.site.x));
 		if (above.circleEvent != null) {   // false alarm
-			above.circleEvent.remove();
+			context.eventQueue.remove(above.circleEvent);
 			above.setCircleEvent(null);
 		}
-		System.out.println(String.format("- Above: %f ~ %f %f,%f", above.getLeftX(),
-				above.getRightX(), above.site.x, above.site.y));
-
 
 		// insert new arc
 		BreakPoint origL = above.left;
 		BreakPoint origR = above.right;
 		BreakPoint breakL = new BreakPoint(context);
 		BreakPoint breakR = new BreakPoint(context);
+
 		Arc newLeft = new Arc(origL, breakL, above.site);
 		Arc newCenter = new Arc(breakL, breakR, event.site);
 		Arc newRight = new Arc(breakR, origR, above.site);
+
 		breakL.setLeft(newLeft);
 		breakL.setRight(newCenter);
 		breakL.begin();
 		breakR.setLeft(newCenter);
 		breakR.setRight(newRight);
 		breakR.begin();
+
 		if (origL != null)
 			origL.setRight(newLeft);
 		if (origR != null)
@@ -363,72 +446,86 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 
 		context.breakPoints.add(breakL);
 		context.breakPoints.add(breakR);
+
 		beachLine.remove(above);
 		beachLine.add(newLeft);
 		beachLine.add(newCenter);
 		beachLine.add(newRight);
 
-		// new edge
-
-		// check for new circle events
+		// check for circle events
 		this.checkForCircleEvent(context, newLeft);
 		this.checkForCircleEvent(context, newRight);
 	}
 
+	/**
+	 * Handle <i>circle event</i>
+	 *
+	 * @param context
+	 * 		Current context
+	 * @param event
+	 * 		Circle event
+	 */
 	protected void handleCircleEvent(Context context, CircleEvent event) {
-		// false alarm
-		if (event.removed)
-			return;
-
-		System.out.println(String.format("Circle Event: %f ~ %f %f,%f", event.target
-				.getLeftX(), event.target.getRightX(), event.target.site.x, event.target
-				.site.y));
-
 		Arc target = event.target;
 		TreeSet<Arc> beachLine = context.beachLine;
-
-		// remove arc
-		System.out.println(beachLine.remove(target));
+		if (target.left == null || target.right == null)
+			return;
 
 		// false alarms
 		BreakPoint targetL = target.left;
-		BreakPoint targetR = target.right;
-		if (targetL != null && targetL.left.circleEvent != null) {
-			targetL.left.circleEvent.remove();
+		if (targetL.left.circleEvent != null) {
+			context.eventQueue.remove(targetL.left.circleEvent);
 			targetL.left.setCircleEvent(null);
 		}
-		if (targetR != null && targetR.right.circleEvent != null) {
-			targetR.right.circleEvent.remove();
+		BreakPoint targetR = target.right;
+		if (targetR.right.circleEvent != null) {
+			context.eventQueue.remove(targetR.right.circleEvent);
 			targetR.right.setCircleEvent(null);
 		}
 
-		// update voronoi result
-
 		// update beach line
 		BreakPoint newBreakPoint = new BreakPoint(context, targetL.left, targetR.right);
-		targetL.left.setRight(newBreakPoint);
-		targetR.right.setLeft(newBreakPoint);
-		context.breakPoints.add(newBreakPoint);
 		newBreakPoint.begin();
+
 		targetL.finish();
 		targetR.finish();
+
+		targetL.left.setRight(newBreakPoint);
+		targetR.right.setLeft(newBreakPoint);
+
+		context.breakPoints.add(newBreakPoint);
+		beachLine.remove(target);
 
 		// check for circle events
 		checkForCircleEvent(context, targetL.left);
 		checkForCircleEvent(context, targetR.right);
 	}
 
+	/**
+	 * A circle event is generated if and only if the target arc's site, the arc left
+	 * of the target arc's site and the site of the right one are counterclockwise.<br />
+	 * The final <i>circle event</i>'s point must be under the current sweep line, or
+	 * the target arc would not exist.
+	 *
+	 * @param context
+	 * 		Current context
+	 * @param arc
+	 * 		Target arc
+	 */
 	protected void checkForCircleEvent(Context context, Arc arc) {
 		if (arc.left == null || arc.right == null)
 			return;
 
-		// local variables decorated with final to improve performance
-		// the following code solves the center of the three sites' circumcircle
 		final Point s1 = arc.left.left.site;
 		final Point s2 = arc.site;
 		final Point s3 = arc.right.right.site;
+
+		// points must be counterclockwise
 		if ((s2.x - s1.x) * (s3.y - s1.y) - (s2.y - s1.y) * (s3.x - s1.x) <= 0)
 			return;
+
+		// calculate center of the sites' circumcircle
+		// x and y are solved using Cramer's Rule
 		final double x1 = s1.x, x2 = s2.x, x3 = s3.x;
 		final double y1 = s1.y, y2 = s2.y, y3 = s3.y;
 		final double
@@ -438,53 +535,21 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 				d = y3 - y2,
 				e = (y2 * y2 - y1 * y1 + x2 * x2 - x1 * x1) / 2,
 				f = (y3 * y3 - y2 * y2 + x3 * x3 - x2 * x2) / 2;
-		final double epsilon = 1e-3;
 		final double matD = a * d - c * b;
-
-		if (Math.abs(matD) < epsilon)    // no solution
+		final double epsilon = 1e-3;
+		if (Math.abs(matD) < epsilon)    // equation has no solution
 			return;
+		// ( x, y ) is the circle's center
 		final double x = (e * d - f * b) / matD;
 		final double y = (a * f - c * e) / matD;
-		// ( x , y ) is the circle center
 
-		// calculate the position of the circle event
-		final double dist = Math.sqrt(square(x - x2) + square(y - y2));
-//		System.out.println("Possible circle event: " + x + "," + y + dist);
-		Point eventPoint = new Point(x, y + dist);
-//		if (eventPoint.y < context.sweepLine)
-//			return;
+		// position of the circle event
+		final double radius = Math.sqrt(square(x - x2) + square(y - y2));
+		Point eventPoint = new Point(x, y + radius);
 
-		// add circle event
+		// add circle event to the queue
 		CircleEvent event = new CircleEvent(arc, eventPoint);
 		context.eventQueue.offer(event);
 		arc.setCircleEvent(event);
-
-		// DEBUG HACK START
-		CircleEvent event2 = new CircleEvent(arc, new Point(x, y));
-		context.circleEvents.add(event2);
-		System.out.println(
-				String.format("%f, %f | %f, %f | %f, %f", x1, y1, x2, y2, x3, y3));
-		// DEBUG HACK END
-	}
-
-	private void cacheBeachLine(Context context) {
-		List<Parabola> parabolas = new Vector<>();
-		for (Arc arc : context.beachLine)
-			parabolas.add(new Parabola(arc.site, context.sweepLine, arc.getLeftX(), arc
-					.getRightX()));
-		context.cachedBeachLines.add(parabolas);
-	}
-
-	public static class Parabola {
-		public Point focus;
-		public double directrix;
-		public double left, right;
-
-		public Parabola(Point focus, double directrix, double left, double right) {
-			this.focus = focus;
-			this.directrix = directrix;
-			this.left = left;
-			this.right = right;
-		}
 	}
 }

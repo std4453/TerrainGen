@@ -23,7 +23,7 @@ public class FortuneTest {
 		final int points = 100;
 		final long seed = 10;
 //		final Boundaries boundaries = new Boundaries(0, 100, 0, 100);
-		final Boundaries boundaries = new Boundaries(-10, 10, -10, 10);
+		final Boundaries boundaries = new Boundaries(-100, 100, -100, 100);
 
 		ProcessorNode<Long, PointBox> randomPoints = new ProcessorNode<>(
 				new PointsWhiteNoise(boundaries, points));
