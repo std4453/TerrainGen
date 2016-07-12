@@ -6,6 +6,8 @@ package terraingen.utils;
  * double to an int ), methods here should be imported statically for easy use.
  */
 public class MathUtils {
+	public static final double eps = 1e-5;
+
 	public static double square(double n) {
 		return n * n;
 	}

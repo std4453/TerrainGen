@@ -7,6 +7,7 @@ import terraingen.backend.nodegraph.IProcessor;
 
 import java.util.*;
 
+import static terraingen.utils.MathUtils.eps;
 import static terraingen.utils.MathUtils.square;
 
 public class Fortune implements IProcessor<PointBox, VoronoiBox> {
@@ -207,7 +208,7 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 				final double c = (y0 - y1) * (y1 - y2) * (y2 - y0) + (square(
 						x2) * y1 - square(x1) * y2) + y0 * (square(x1) - square(x2));
 				final double delta = square(b) - 4 * a * c;
-				double sqrtDelta = delta < 1e-3 ? 0 : Math.sqrt(delta);
+				double sqrtDelta = delta < eps ? 0 : Math.sqrt(delta);
 				x = (sqrtDelta - b) / a / 2;
 				y = (y1 + y2) / 2 + (x1 - x2) * (x1 + x2 - 2 * x) / 2 / (y1 - y2);
 			}
@@ -536,8 +537,7 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 				e = (y2 * y2 - y1 * y1 + x2 * x2 - x1 * x1) / 2,
 				f = (y3 * y3 - y2 * y2 + x3 * x3 - x2 * x2) / 2;
 		final double matD = a * d - c * b;
-		final double epsilon = 1e-3;
-		if (Math.abs(matD) < epsilon)    // equation has no solution
+		if (Math.abs(matD) < eps)    // equation has no solution
 			return;
 		// ( x, y ) is the circle's center
 		final double x = (e * d - f * b) / matD;
