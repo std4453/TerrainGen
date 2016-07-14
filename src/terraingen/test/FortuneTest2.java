@@ -7,9 +7,7 @@ import terraingen.backend.commons.random.PointsWhiteNoise;
 import terraingen.backend.commons.voronoi.Fortune;
 import terraingen.backend.commons.voronoi.VoronoiBox;
 import terraingen.backend.commons.voronoi.VoronoiRenderer;
-import terraingen.backend.nodegraph.Executor;
-import terraingen.backend.nodegraph.ProcessorNode;
-import terraingen.backend.nodegraph.Statement;
+import terraingen.backend.nodegraph.*;
 
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
@@ -22,7 +20,8 @@ import java.awt.event.MouseMotionListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.ImageObserver;
 
-public class FortuneTest2 implements MouseMotionListener, MouseListener {
+public class FortuneTest2 implements MouseMotionListener, MouseListener,
+		IProcessor<PointBox, PointBox> {
 	protected int width = 600;
 	protected int height = 600;
 	protected BufferedImage image;
@@ -38,13 +37,16 @@ public class FortuneTest2 implements MouseMotionListener, MouseListener {
 	}
 
 	public FortuneTest2() {
-		final int initial = 20;
+		final int initial = 80;
 		final long seed = 4453;
 
-		Boundaries boundaries = new Boundaries(0, 100, 0, 100);
+		Boundaries boundaries = new Boundaries(0, 10, 0, 10);
 		ProcessorNode<Long, PointBox> pointGenerator = new ProcessorNode<>(new
 				PointsWhiteNoise(boundaries, initial));
-		Statement<Long, PointBox> pointGenerator2 = new Statement<>(pointGenerator);
+		ProcessorNode<PointBox, PointBox> addSamePoint = new ProcessorNode<>(this);
+		new Edge<>(pointGenerator.getOutput(), addSamePoint.getInput());
+		Statement<Long, PointBox> pointGenerator2 = new Statement<>(
+				pointGenerator.getInput(), addSamePoint.getOutput());
 		this.pointBox = Executor.execute(pointGenerator2, seed);
 		ProcessorNode<PointBox, VoronoiBox> voronoi = new ProcessorNode<>(new Fortune());
 		this.voronoi = new Statement<>(voronoi);
@@ -146,5 +148,17 @@ public class FortuneTest2 implements MouseMotionListener, MouseListener {
 
 	@Override
 	public void mouseExited(MouseEvent e) {
+	}
+
+	@Override
+	public PointBox process(PointBox input) {
+//		java.util.List<Point> points = input.getPoints();
+//		double minY = Double.POSITIVE_INFINITY;
+//		for (Point point : points)
+//			if (point.y < minY)
+//				minY = point.y;
+//
+//		input.addPoint(new Point(1, minY));
+		return input;
 	}
 }

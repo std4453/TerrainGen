@@ -7,6 +7,7 @@ import terraingen.backend.nodegraph.IProcessor;
 
 import java.util.*;
 
+import static terraingen.utils.MathUtils.abs;
 import static terraingen.utils.MathUtils.eps;
 import static terraingen.utils.MathUtils.square;
 
@@ -413,6 +414,28 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 		// first site event
 		if (beachLine.size() == 0) {
 			beachLine.add(new Arc(null, null, event.site));
+			return;
+		}
+
+		// edge case which will result in a bug
+		if (beachLine.size() == 1 && abs(beachLine.first().site.y - event.site.y) < eps) {
+			Arc first = beachLine.first();
+			BreakPoint breakPoint = new BreakPoint(context);
+			Arc newArc = null;
+			if (first.site.x < event.site.x) {
+				newArc = new Arc(breakPoint, null, event.site);
+				breakPoint.setLeft(first);
+				breakPoint.setRight(newArc);
+				first.setRight(breakPoint);
+			} else {
+				newArc = new Arc(null, breakPoint, event.site);
+				breakPoint.setLeft(newArc);
+				breakPoint.setRight(first);
+				first.setLeft(breakPoint);
+			}
+			breakPoint.begin();
+			context.breakPoints.add(breakPoint);
+			beachLine.add(newArc);
 			return;
 		}
 
