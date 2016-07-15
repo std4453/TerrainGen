@@ -197,11 +197,14 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 			final double y1 = s1.y, y2 = s2.y;
 
 			double x, y;
-			if (y1 == y2) {
+			if (abs(y1 - y2) < eps) {
 				// when site points of two parabolas have the same y coord then there's
 				// only one intersection point, so it is solved to reduce calculations
 				x = (x1 + x2) / 2;
-				y = (y0 + y1) / 2 - (y0 - y1) * square(x1 - x2) / 8;
+				if (abs(y0 - y1) < eps)
+					y = Double.NEGATIVE_INFINITY;
+				else
+					y = (y0 + y1) / 2 - square(x1 - x2) / 8 / (y0 - y1);
 			} else {
 				// math solve of intersection of two parabolas
 				final double a = y1 - y2;
@@ -421,7 +424,7 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 		if (beachLine.size() == 1 && abs(beachLine.first().site.y - event.site.y) < eps) {
 			Arc first = beachLine.first();
 			BreakPoint breakPoint = new BreakPoint(context);
-			Arc newArc = null;
+			Arc newArc;
 			if (first.site.x < event.site.x) {
 				newArc = new Arc(breakPoint, null, event.site);
 				breakPoint.setLeft(first);
@@ -436,6 +439,7 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 			breakPoint.begin();
 			context.breakPoints.add(breakPoint);
 			beachLine.add(newArc);
+
 			return;
 		}
 

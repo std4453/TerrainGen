@@ -46,7 +46,7 @@ public class FortuneTest2 implements MouseMotionListener, MouseListener,
 		final long seed = 4453;
 
 		// generate initial points
-		Boundaries boundaries = new Boundaries(0, 10, 0, 10);
+		Boundaries boundaries = new Boundaries(0, 100, 0, 100);
 		ProcessorNode<Long, PointBox> initialPoints = new ProcessorNode<>(new
 				PointsWhiteNoise(boundaries, pointCount));
 		ProcessorNode<PointBox, PointBox> testEdgeCase = new ProcessorNode<>(this);
