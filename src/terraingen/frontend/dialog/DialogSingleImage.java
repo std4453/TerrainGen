@@ -4,7 +4,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import javax.swing.*;
+import javax.swing.border.CompoundBorder;
 import javax.swing.border.EmptyBorder;
+import javax.swing.border.LineBorder;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
@@ -14,7 +16,7 @@ public class DialogSingleImage implements IDialog {
 	public static DialogSingleImage instance = new DialogSingleImage();
 
 	/** Just there to get rid of magic numbers */
-	private static int IMAGE_MARGIN = 30;
+	private static int IMAGE_MARGIN = 20;
 
 	protected JFrame createFrame() {
 		JFrame frame = new JFrame();
@@ -31,8 +33,8 @@ public class DialogSingleImage implements IDialog {
 		frame.setContentPane(panel);
 		panel.setLayout(new BorderLayout());
 		JLabel label = new JLabel(icon);
-		label.setBorder(
-				new EmptyBorder(IMAGE_MARGIN, IMAGE_MARGIN, IMAGE_MARGIN, IMAGE_MARGIN));
+		label.setBorder(new CompoundBorder(new EmptyBorder(IMAGE_MARGIN, IMAGE_MARGIN,
+				IMAGE_MARGIN, IMAGE_MARGIN), new LineBorder(Color.BLACK)));
 		panel.add(label);
 
 		return label;
