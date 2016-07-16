@@ -4,6 +4,7 @@ import terraingen.backend.commons.Boundaries;
 import terraingen.backend.commons.Point;
 import terraingen.backend.commons.PointBox;
 import terraingen.backend.nodegraph.IProcessor;
+import terraingen.utils.MathUtils;
 
 import java.util.*;
 
@@ -151,6 +152,17 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 		public Point beginPoint;
 
 		/**
+		 * Edge of the voronoi box
+		 */
+		public VoronoiBox.Edge edge;
+		/**
+		 * True when the final point of the {@code BreakPoint} is assigned to the first
+		 * point of the
+		 * {@linkplain terraingen.backend.commons.voronoi.VoronoiBox.Edge Edge}
+		 */
+		public boolean point1;
+
+		/**
 		 * Point that stay unchanged when the sweep line stays still. A cache is built
 		 * so that calculations go faster.
 		 */
@@ -162,6 +174,21 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 			this.left = left;
 			this.right = right;
 			this.finalPoint = null;
+		}
+
+		/**
+		 * Set the edge and point assignment of the {@code BreakPoint}, should be
+		 * called before {@code finish()} of this {@code BreakPoint} is called
+		 *
+		 * @param edge
+		 * 		The edge
+		 * @param point1
+		 * 		Whether the final point should be bound to the first point of
+		 * 		the	{@linkplain terraingen.backend.commons.voronoi.VoronoiBox.Edge Edge}
+		 */
+		public void setEdge(VoronoiBox.Edge edge, boolean point1) {
+			this.edge = edge;
+			this.point1 = point1;
 		}
 
 		/**
@@ -223,12 +250,20 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 		}
 
 		public void begin() {
-			this.beginPoint = this.getPoint();
+//			this.beginPoint = this.getPoint();
 		}
 
 		public void finish() {
-			this.finalPoint = this.getPoint();
-			this.context.edges.add(new VoronoiBox.Edge(this.beginPoint, this.finalPoint));
+			finish(this.getPoint());
+		}
+
+		public void finish(Point point) {
+			this.finalPoint = point;
+//			this.context.edges.add(new VoronoiBox.Edge(this.beginPoint, this.finalPoint));
+			if (this.point1)
+				this.edge.setPoint1(this.finalPoint);
+			else
+				this.edge.setPoint2(this.finalPoint);
 		}
 	}
 
@@ -392,15 +427,42 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 		List<VoronoiBox.Cell> cells = new Vector<>();
 		cells.addAll(context.cells.values());
 
-		List<Point> voronoiPoints = new Vector<>();
+//		List<Point> voronoiPoints = new Vector<>();
 		for (BreakPoint breakPoint : context.breakPoints) {
-			if (breakPoint.finalPoint == null)
+//			if (breakPoint.finalPoint == null)
+//				breakPoint.finish();
+//			voronoiPoints.add(breakPoint.finalPoint);
+			if (breakPoint.finalPoint == null) {
 				breakPoint.finish();
-			voronoiPoints.add(breakPoint.finalPoint);
+				context.voronoiPoints.add(breakPoint.finalPoint);
+			}
 		}
 
+		// sort cell edges
+		Set<Point> points = new HashSet<>();
+		for (VoronoiBox.Cell cell : cells) {
+			points.clear();
+			Point site = cell.site;
+			for (VoronoiBox.Edge edge : cell.edges) {
+				points.add(edge.point1);
+				points.add(edge.point2);
+			}
+			cell.vertices.addAll(points);
+			cell.vertices.sort(new Comparator<Point>() {
+				@Override
+				public int compare(Point o1, Point o2) {
+					double angle1 = MathUtils.angle(site, o1);
+					double angle2 = MathUtils.angle(site, o2);
+					return Double.compare(angle1, angle2);
+				}
+			});
+		}
+
+//		return new VoronoiBox(context.boundaries, context.points, context.edges,
+//				cells, voronoiPoints);
 		return new VoronoiBox(context.boundaries, context.points, context.edges,
-				cells, voronoiPoints);
+				cells,
+				context.voronoiPoints);
 	}
 
 	/**
@@ -436,9 +498,18 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 				breakPoint.setRight(first);
 				first.setLeft(breakPoint);
 			}
-			breakPoint.begin();
+//			breakPoint.begin();
 			context.breakPoints.add(breakPoint);
 			beachLine.add(newArc);
+
+			// set edge
+			Point point1 = breakPoint.getPoint();
+			context.voronoiPoints.add(point1);
+			VoronoiBox.Edge edge = new VoronoiBox.Edge(context.cells.get(first.site),
+					context.cells.get(event.site));
+			edge.setPoint1(point1);
+			breakPoint.setEdge(edge, false);
+			context.edges.add(edge);
 
 			return;
 		}
@@ -462,10 +533,10 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 
 		breakL.setLeft(newLeft);
 		breakL.setRight(newCenter);
-		breakL.begin();
+//		breakL.begin();
 		breakR.setLeft(newCenter);
 		breakR.setRight(newRight);
-		breakR.begin();
+//		breakR.begin();
 
 		if (origL != null)
 			origL.setRight(newLeft);
@@ -479,6 +550,13 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 		beachLine.add(newLeft);
 		beachLine.add(newCenter);
 		beachLine.add(newRight);
+
+		// set edge
+		VoronoiBox.Edge edge = new VoronoiBox.Edge(context.cells.get(above.site),
+				context.cells.get(event.site));
+		breakL.setEdge(edge, true);
+		breakR.setEdge(edge, false);
+		context.edges.add(edge);
 
 		// check for circle events
 		this.checkForCircleEvent(context, newLeft);
@@ -513,16 +591,26 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 
 		// update beach line
 		BreakPoint newBreakPoint = new BreakPoint(context, targetL.left, targetR.right);
-		newBreakPoint.begin();
+//		newBreakPoint.begin();
 
-		targetL.finish();
-		targetR.finish();
+		Point point1 = newBreakPoint.getPoint();
+		context.voronoiPoints.add(point1);
+
+		targetL.finish(point1);
+		targetR.finish(point1);
 
 		targetL.left.setRight(newBreakPoint);
 		targetR.right.setLeft(newBreakPoint);
 
 		context.breakPoints.add(newBreakPoint);
 		beachLine.remove(target);
+
+		// set edge
+		VoronoiBox.Edge edge = new VoronoiBox.Edge(context.cells.get(targetL.left.site),
+				context.cells.get(targetR.right.site));
+		edge.setPoint1(point1);
+		newBreakPoint.setEdge(edge, false);
+		context.edges.add(edge);
 
 		// check for circle events
 		checkForCircleEvent(context, targetL.left);
