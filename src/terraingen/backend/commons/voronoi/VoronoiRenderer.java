@@ -7,6 +7,7 @@ import terraingen.backend.nodegraph.IProcessor;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Random;
+import java.util.Set;
 
 import static terraingen.utils.MathUtils.round;
 
@@ -57,13 +58,14 @@ public class VoronoiRenderer implements IProcessor<VoronoiBox, BufferedImage> {
 							() / 2 + 128);
 			g.setColor(color);
 
-			java.util.List<Point> vertices = cell.vertices;
-			int n = vertices.size();
+			Set<Point> vertices = cell.vertices;
+			int n = vertices.size(), i = 0;
 			int[] xPoints = new int[n], yPoints = new int[n];
-			for (int i = 0; i < n; ++i) {
-				Point p = transfer(boundaries, vertices.get(i), image);
-				xPoints[i] = (int) p.x;
-				yPoints[i] = (int) p.y;
+			for (Point p : vertices) {
+				Point pScreen = transfer(boundaries, p, image);
+				xPoints[i] = (int) pScreen.x;
+				yPoints[i] = (int) pScreen.y;
+				++i;
 			}
 			g.fill(new Polygon(xPoints, yPoints, n));
 		}

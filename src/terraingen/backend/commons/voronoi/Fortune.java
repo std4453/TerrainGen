@@ -4,7 +4,6 @@ import terraingen.backend.commons.Boundaries;
 import terraingen.backend.commons.Point;
 import terraingen.backend.commons.PointBox;
 import terraingen.backend.nodegraph.IProcessor;
-import terraingen.utils.MathUtils;
 
 import java.util.*;
 
@@ -249,17 +248,12 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 			return this.cachedPoint;
 		}
 
-		public void begin() {
-//			this.beginPoint = this.getPoint();
-		}
-
 		public void finish() {
 			finish(this.getPoint());
 		}
 
 		public void finish(Point point) {
 			this.finalPoint = point;
-//			this.context.edges.add(new VoronoiBox.Edge(this.beginPoint, this.finalPoint));
 			if (this.point1)
 				this.edge.setPoint1(this.finalPoint);
 			else
@@ -427,39 +421,16 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 		List<VoronoiBox.Cell> cells = new Vector<>();
 		cells.addAll(context.cells.values());
 
-//		List<Point> voronoiPoints = new Vector<>();
 		for (BreakPoint breakPoint : context.breakPoints) {
-//			if (breakPoint.finalPoint == null)
-//				breakPoint.finish();
-//			voronoiPoints.add(breakPoint.finalPoint);
 			if (breakPoint.finalPoint == null) {
 				breakPoint.finish();
 				context.voronoiPoints.add(breakPoint.finalPoint);
 			}
 		}
 
-		// sort cell edges
-		Set<Point> points = new HashSet<>();
-		for (VoronoiBox.Cell cell : cells) {
-			points.clear();
-			Point site = cell.site;
-			for (VoronoiBox.Edge edge : cell.edges) {
-				points.add(edge.point1);
-				points.add(edge.point2);
-			}
-			cell.vertices.addAll(points);
-			cell.vertices.sort(new Comparator<Point>() {
-				@Override
-				public int compare(Point o1, Point o2) {
-					double angle1 = MathUtils.angle(site, o1);
-					double angle2 = MathUtils.angle(site, o2);
-					return Double.compare(angle1, angle2);
-				}
-			});
-		}
+		for (VoronoiBox.Cell cell : cells)
+			cell.generatePoints();
 
-//		return new VoronoiBox(context.boundaries, context.points, context.edges,
-//				cells, voronoiPoints);
 		return new VoronoiBox(context.boundaries, context.points, context.edges,
 				cells,
 				context.voronoiPoints);
@@ -498,7 +469,6 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 				breakPoint.setRight(first);
 				first.setLeft(breakPoint);
 			}
-//			breakPoint.begin();
 			context.breakPoints.add(breakPoint);
 			beachLine.add(newArc);
 
@@ -533,10 +503,8 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 
 		breakL.setLeft(newLeft);
 		breakL.setRight(newCenter);
-//		breakL.begin();
 		breakR.setLeft(newCenter);
 		breakR.setRight(newRight);
-//		breakR.begin();
 
 		if (origL != null)
 			origL.setRight(newLeft);
@@ -591,7 +559,6 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 
 		// update beach line
 		BreakPoint newBreakPoint = new BreakPoint(context, targetL.left, targetR.right);
-//		newBreakPoint.begin();
 
 		Point point1 = newBreakPoint.getPoint();
 		context.voronoiPoints.add(point1);

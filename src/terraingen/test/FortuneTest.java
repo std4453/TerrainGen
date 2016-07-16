@@ -1,5 +1,7 @@
 package terraingen.test;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import terraingen.backend.commons.Boundaries;
 import terraingen.backend.commons.PointBox;
 import terraingen.backend.commons.random.PointsWhiteNoise;
@@ -17,8 +19,10 @@ import java.awt.image.BufferedImage;
  *
  */
 public class FortuneTest {
+	private static final Log log = LogFactory.getLog(FortuneTest.class);
+
 	public static void main(String[] args) {
-		final int points = 1000;
+		final int points = 3000;
 		final long seed = 4453;
 		final Boundaries boundaries = new Boundaries(0, 100, 0, 100);
 
@@ -28,19 +32,19 @@ public class FortuneTest {
 		ProcessorNode<VoronoiBox, BufferedImage> renderer = new ProcessorNode<>(
 				new VoronoiRenderer());
 
-		// profiler components
+		// profiler pipeline
 		Statement<Long, PointBox> pointsGenerator = new Statement<>(randomPoints);
 		PointBox pointBox = Executor.execute(pointsGenerator, seed);
 		Statement<PointBox, VoronoiBox> voronoiGenerator = new Statement<>(voronoi);
 
 		// profiler
 		long startTime = System.currentTimeMillis();
-		final int repeats = 1000;
+		final int repeats = 100;
 		for (int i = 0; i < repeats; ++i)
 			Executor.execute(voronoiGenerator, pointBox);
 		long endTime = System.currentTimeMillis();
 
-		System.out.println(
+		log.info(
 				String.format("Points: %d, Repeats: %d, Time: %dms", points, repeats,
 						(endTime - startTime)));
 
