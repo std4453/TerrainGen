@@ -6,6 +6,7 @@ import terraingen.backend.nodegraph.IProcessor;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.Random;
 
 import static terraingen.utils.MathUtils.round;
 
@@ -47,6 +48,25 @@ public class VoronoiRenderer implements IProcessor<VoronoiBox, BufferedImage> {
 		// clear background
 		g.setColor(Color.WHITE);
 		g.fillRect(0, 0, WIDTH, HEIGHT);
+		// fill in voronoi cells
+		Random random = new Random();
+		for (VoronoiBox.Cell cell : input.getCells()) {
+			Color color = new Color(random.nextInt(0x1000000));
+			color = new Color(color.getRed() / 2 + 128, color.getGreen() / 2 + 128,
+					color.getBlue
+							() / 2 + 128);
+			g.setColor(color);
+
+			java.util.List<Point> vertices = cell.vertices;
+			int n = vertices.size();
+			int[] xPoints = new int[n], yPoints = new int[n];
+			for (int i = 0; i < n; ++i) {
+				Point p = transfer(boundaries, vertices.get(i), image);
+				xPoints[i] = (int) p.x;
+				yPoints[i] = (int) p.y;
+			}
+			g.fill(new Polygon(xPoints, yPoints, n));
+		}
 		// draw voronoi edges
 		g.setColor(Color.BLACK);
 		for (VoronoiBox.Edge edge : input.getEdges()) {
