@@ -37,16 +37,16 @@ public class FortuneTest {
 		PointBox pointBox = Executor.execute(pointsGenerator, seed);
 		Statement<PointBox, VoronoiBox> voronoiGenerator = new Statement<>(voronoi);
 
-		// profiler
-		long startTime = System.currentTimeMillis();
-		final int repeats = 100;
-		for (int i = 0; i < repeats; ++i)
-			Executor.execute(voronoiGenerator, pointBox);
-		long endTime = System.currentTimeMillis();
-
-		log.info(
-				String.format("Points: %d, Repeats: %d, Time: %dms", points, repeats,
-						(endTime - startTime)));
+//		// profiler
+//		long startTime = System.currentTimeMillis();
+//		final int repeats = 1000;
+//		for (int i = 0; i < repeats; ++i)
+//			Executor.execute(voronoiGenerator, pointBox);
+//		long endTime = System.currentTimeMillis();
+//
+//		log.info(
+//				String.format("Points: %d, Repeats: %d, Time: %dms", points, repeats,
+//						(endTime - startTime)));
 
 		// display image
 		VoronoiBox voronoiBox = Executor.execute(voronoiGenerator, pointBox);

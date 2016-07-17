@@ -1,12 +1,14 @@
 package terraingen.test;
 
 import terraingen.backend.commons.Boundaries;
+import terraingen.backend.commons.Point;
 import terraingen.backend.commons.PointBox;
 import terraingen.backend.commons.random.PointsWhiteNoise;
 import terraingen.backend.commons.voronoi.Fortune;
 import terraingen.backend.commons.voronoi.VoronoiBox;
 import terraingen.backend.commons.voronoi.VoronoiRenderer;
 import terraingen.backend.nodegraph.*;
+import terraingen.utils.MathUtils;
 
 import javax.swing.*;
 import javax.swing.border.CompoundBorder;
@@ -131,11 +133,8 @@ public class FortuneTest2 implements MouseMotionListener, MouseListener,
 		double y = event.getY() - insets.left;
 
 		Boundaries boundaries = this.pointBox.getBoundaries();
-		double bWidth = boundaries.right - boundaries.left;
-		double bHeight = boundaries.bottom - boundaries.top;
-		return new terraingen.backend.commons.Point(
-				x / this.width * bWidth + boundaries.left,
-				y / this.height * bHeight + boundaries.top);
+		Boundaries imageBoundaries = new Boundaries(0, this.height, 0, this.width);
+		return MathUtils.transform(imageBoundaries, new Point(x, y), boundaries);
 	}
 
 	/**

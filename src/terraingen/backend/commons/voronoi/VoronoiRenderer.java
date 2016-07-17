@@ -3,6 +3,7 @@ package terraingen.backend.commons.voronoi;
 import terraingen.backend.commons.Boundaries;
 import terraingen.backend.commons.Point;
 import terraingen.backend.nodegraph.IProcessor;
+import terraingen.utils.MathUtils;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -17,18 +18,14 @@ import static terraingen.utils.MathUtils.round;
 public class VoronoiRenderer implements IProcessor<VoronoiBox, BufferedImage> {
 	private static final int WIDTH = 600;
 	private static final int HEIGHT = 600;
-	private static final int POINT_SIZE = 6;
+	private static final int POINT_SIZE = 5;
 	private static final int VORONOI_POINT_SIZE = 3;
 
 	protected static Point transfer(Boundaries boundaries, Point input, BufferedImage
 			image) {
-		double bWidth = boundaries.right - boundaries.left;
-		double bHeight = boundaries.bottom - boundaries.top;
-		double iWidth = image.getWidth();
-		double iHeight = image.getHeight();
-
-		return new Point((input.x - boundaries.left) / bWidth * iWidth,
-				(input.y - boundaries.top) / bHeight * iHeight);
+		Boundaries imageBoundaries = new Boundaries(0, image.getWidth(), 0,
+				image.getHeight());
+		return MathUtils.transform(boundaries, input, imageBoundaries);
 	}
 
 	@Override

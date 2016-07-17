@@ -1,5 +1,6 @@
 package terraingen.utils;
 
+import terraingen.backend.commons.Boundaries;
 import terraingen.backend.commons.Point;
 
 /**
@@ -40,5 +41,14 @@ public class MathUtils {
 	public static double angle(Point center, Point point) {
 		double dx = point.x - center.x, dy = point.y - center.y;
 		return Math.atan2(dy, dx);
+	}
+
+	public static Point transform(Boundaries original, Point point, Boundaries target) {
+		double oWidth = original.right - original.left;
+		double oHeight = original.bottom - original.top;
+		double tWidth = target.right - target.left;
+		double tHeight = target.bottom - target.top;
+		return new Point((point.x - original.left) / oWidth * tWidth + target.left,
+				(point.y - original.top) / oHeight * tHeight + target.top);
 	}
 }
