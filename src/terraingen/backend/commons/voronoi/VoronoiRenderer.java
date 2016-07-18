@@ -47,12 +47,12 @@ public class VoronoiRenderer implements IProcessor<VoronoiBox, BufferedImage> {
 		g.setColor(Color.WHITE);
 		g.fillRect(0, 0, WIDTH, HEIGHT);
 		// fill in voronoi cells
-		Random random = new Random();
+		Random random = new Random(input.getCells().size());
 		for (VoronoiBox.Cell cell : input.getCells()) {
 			Color color = new Color(random.nextInt(0x1000000));
-			color = new Color(color.getRed() / 2 + 128, color.getGreen() / 2 + 128,
-					color.getBlue
-							() / 2 + 128);
+			color = new Color(color.getRed() / 2 + 128,
+					color.getGreen() / 2 + 128,
+					color.getBlue() / 2 + 128);
 			g.setColor(color);
 
 			Set<Point> vertices = cell.vertices;
