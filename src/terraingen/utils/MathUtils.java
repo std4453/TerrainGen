@@ -27,6 +27,14 @@ public class MathUtils {
 		return (int) Math.round(n);
 	}
 
+	public static double max(double a, double b) {
+		return a > b ? a : b;
+	}
+
+	public static double min(double a, double b) {
+		return a < b ? a : b;
+	}
+
 	/**
 	 * Calculates the angle of {@code point} to {@code center}
 	 *
