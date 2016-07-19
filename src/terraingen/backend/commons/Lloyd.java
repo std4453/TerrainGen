@@ -15,17 +15,33 @@ public class Lloyd implements IProcessor<VoronoiBox, PointBox> {
 		List<Point> points = new Vector<>();
 
 		for (VoronoiBox.Cell cell : input.getCells())
-			points.add(evaluateCentroid(boundaries, cell));
+			points.add(calcCentroid(boundaries, cell));
 		return new PointBox(boundaries, points);
 	}
 
-	protected Point evaluateCentroid(Boundaries boundaries, VoronoiBox.Cell cell) {
+	/**
+	 * Clip cell to the {@link Boundaries}, and the centroid of each {@linkplain
+	 * terraingen.backend.commons.voronoi.VoronoiBox.Cell Cell} is calculated and set
+	 * to be the site of the cell in the next iteration.<br /><br />
+	 * Actually, for performance reasons, the average of the vertices of the cell are
+	 * calculated instead of the real centroid. Effects proved that this method works
+	 * as well.
+	 *
+	 * @param boundaries
+	 * 		The {@link Boundaries} of the {@link VoronoiBox}
+	 * @param cell
+	 * 		The cell whose centroid is to calculate
+	 *
+	 * @return The calculated centroid of the cell
+	 */
+	protected Point calcCentroid(Boundaries boundaries, VoronoiBox.Cell cell) {
 		Collection<VoronoiBox.Edge> edges = cell.edges;
 		Point center = cell.site;
 		Set<Point> points = new TreeSet<>(new VoronoiBox.Cell.PointComparator(center));
 
 		for (VoronoiBox.Edge edge : edges)
 			intersect(points, boundaries, edge);
+		// FIXME: should add corner points to cells that contain them
 
 		double x = 0, y = 0;
 		for (Point point : points) {
@@ -41,6 +57,26 @@ public class Lloyd implements IProcessor<VoronoiBox, PointBox> {
 				boundaries.bottom && point.y >= boundaries.top;
 	}
 
+	/**
+	 * Calculate the intersection of the line segment ( specified by the {@linkplain
+	 * terraingen.backend.commons.voronoi.VoronoiBox.Edge Edge} ) and adds the end
+	 * points of the intersection to the {@link Set} of point, which indicates the
+	 * vertices of the clipped
+	 * {@linkplain terraingen.backend.commons.voronoi.VoronoiBox.Cell Cell}.
+	 * <br /><br />
+	 * {@link Set} is used that no duplicate points will be in it, so adding both end
+	 * points of the intersection is ok.<br />
+	 * If the {@linkplain terraingen.backend.nodegraph.Edge Edge} has no intersection
+	 * with the {@link Boundaries} then it'll be completely discarded.
+	 *
+	 * @param points
+	 * 		Vertices of the clipped
+	 * 		{@linkplain terraingen.backend.commons.voronoi.VoronoiBox.Cell Cell}
+	 * @param boundaries
+	 * 		The {@link Boundaries} of the {@link VoronoiBox}
+	 * @param edge
+	 * 		The {@linkplain terraingen.backend.nodegraph.Edge Edge} to intersect
+	 */
 	protected void intersect(Set<Point> points, Boundaries boundaries, VoronoiBox
 			.Edge edge) {
 		Point p1 = edge.point1;
