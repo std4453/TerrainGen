@@ -38,7 +38,7 @@ public class VoronoiBox extends PointBox {
 		/**
 		 * Compare points in the cells according to their angle to the site
 		 */
-		protected static class PointComparator implements Comparator<Point> {
+		public static class PointComparator implements Comparator<Point> {
 			protected Point center;
 
 			public PointComparator(Point center) {
