@@ -40,7 +40,9 @@ public class Executor {
 	 * input and output port, or an exception may be thrown.
 	 *
 	 * @param node
+	 * 		node to execute
 	 * @param input
+	 * 		input of node
 	 * @param <I>
 	 * 		Input class
 	 * @param <O>
@@ -50,5 +52,22 @@ public class Executor {
 	 */
 	public static <I, O> O execute(Node<I, O> node, I input) {
 		return execute(new Statement<>(node), input);
+	}
+
+	/**
+	 * Executes the given {@link SupplierNode} and returns result.
+	 *
+	 * @param supplier
+	 * 		The {@link SupplierNode}
+	 * @param <V>
+	 * 		Supplier class
+	 *
+	 * @return Result of supplier
+	 */
+	public static <V> V execute(SupplierNode<V> supplier) {
+		if (supplier.getOutput().getInEdge() == null)
+			new Edge<>(supplier.getOutput(), null);
+		supplier.execute();
+		return supplier.getOutput().getInEdge().getValue();
 	}
 }
