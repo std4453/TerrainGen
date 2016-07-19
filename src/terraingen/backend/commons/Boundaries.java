@@ -71,4 +71,9 @@ public class Boundaries {
 		return point.x >= this.left && point.x <= this.right && point.y >= this.top &&
 				point.y >= this.bottom;
 	}
+
+	public Boundaries expend(double n) {
+		return new Boundaries(this.top - n, this.bottom + n, this.left - n,
+				this.right + n);
+	}
 }
