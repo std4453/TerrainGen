@@ -23,6 +23,9 @@ import java.awt.image.ImageObserver;
 
 public class FortuneTest2 implements MouseMotionListener, MouseListener,
 		IProcessor<PointBox, PointBox> {
+	private static VoronoiRenderer.Conf conf =
+			new VoronoiRenderer.Conf(false, true, true, true);
+
 	protected int width = 600;
 	protected int height = 600;
 	protected BufferedImage image;
@@ -108,7 +111,7 @@ public class FortuneTest2 implements MouseMotionListener, MouseListener,
 	 */
 	protected void generate() {
 		VoronoiBox voronoiBox = Executor.execute(this.voronoi, this.pointBox);
-		VoronoiRenderer.renderToImage(voronoiBox, this.image);
+		VoronoiRenderer.renderToImage(conf, voronoiBox, this.image);
 	}
 
 	/**

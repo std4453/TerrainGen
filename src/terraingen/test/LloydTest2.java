@@ -25,6 +25,9 @@ import java.awt.image.ImageObserver;
  * <a href="https://en.wikipedia.org/wiki/Lloyd%27s_Algorithm"><i>Lloyd Algorithm</i></a>
  */
 public class LloydTest2 {
+	private static final VoronoiRenderer.Conf renderConf =
+			new VoronoiRenderer.Conf(false, true, true, true);
+
 	private static final int width = 600;
 	private static final int height = 600;
 
@@ -41,13 +44,14 @@ public class LloydTest2 {
 		panel.add(this.imageLabel, BorderLayout.CENTER);
 		this.imageLabel.setBorder(new CompoundBorder(new EmptyBorder(20, 20, 20, 20), new
 				LineBorder(Color.BLACK)));
-		this.image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+		this.image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
 		ImageIcon icon = new ImageIcon(this.image);
 		this.imageLabel.setIcon(icon);
 		Graphics g = this.image.getGraphics();
 		g.setColor(Color.WHITE);
 		g.fillRect(0, 0, width, height);
 
+		frame.setResizable(false);
 		placeFrame(frame);
 		frame.setVisible(true);
 
@@ -91,7 +95,7 @@ public class LloydTest2 {
 				voronoi2.getOutput());
 
 		for (int i = 0; i < 50; ++i) {
-			VoronoiRenderer.renderToImage(box, this.image);
+			VoronoiRenderer.renderToImage(renderConf, box, this.image);
 			this.update();
 
 			box = Executor.execute(lloyd2, box);
