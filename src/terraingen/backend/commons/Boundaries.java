@@ -13,6 +13,10 @@ public class Boundaries {
 		this.right = right;
 	}
 
+	public Boundaries(double width, double height) {
+		this(0, height, 0, width);
+	}
+
 	public Boundaries() {
 		this(0, 0, 0, 0);
 	}
