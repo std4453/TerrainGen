@@ -25,6 +25,7 @@ public class VoronoiRenderer implements IProcessor<VoronoiBox, BufferedImage> {
 		 * result in {@code null} for all {@link Color} fields.
 		 */
 		public static Conf defaultConf;
+		public static Conf withoutCellFilling;
 
 		private static final boolean DEFAULT_ANTIALIAS_ENABLED = true;
 		private static final Color DEFAULT_BACKGROUND_COLOR = Color.WHITE;
@@ -43,6 +44,7 @@ public class VoronoiRenderer implements IProcessor<VoronoiBox, BufferedImage> {
 
 		static {
 			defaultConf = new Conf();
+			withoutCellFilling = new Conf(false, true, true, true);
 		}
 
 		public boolean antialias;
@@ -118,6 +120,68 @@ public class VoronoiRenderer implements IProcessor<VoronoiBox, BufferedImage> {
 					DEFAULT_EDGES_RENDERED,
 					DEFAULT_SITES_RENDERED,
 					DEFAULT_VORONOI_POINTS_RENDERED);
+		}
+
+		public void setAntialias(boolean antialias) {
+			this.antialias = antialias;
+		}
+
+		public void setBackground(Color background) {
+			this.background = background;
+		}
+
+		public void setCellFilling(boolean cellFilling) {
+			this.cellFilling = cellFilling;
+		}
+
+		public void setEdges(boolean edges) {
+			this.edges = edges;
+		}
+
+		public void setEdgesColor(Color edgesColor) {
+			this.edgesColor = edgesColor;
+		}
+
+		public void setEdges(boolean edges, Color edgesColor) {
+			setEdges(edges);
+			setEdgesColor(edgesColor);
+		}
+
+		public void setSites(boolean sites) {
+			this.sites = sites;
+		}
+
+		public void setSitesColor(Color sitesColor) {
+			this.sitesColor = sitesColor;
+		}
+
+		public void setSites(boolean sites, Color sitesColor, int sitesSize) {
+			setSites(sites);
+			setSitesColor(sitesColor);
+			setSitesSize(sitesSize);
+		}
+
+		public void setSitesSize(int sitesSize) {
+			this.sitesSize = sitesSize;
+		}
+
+		public void setVoronoiPoints(boolean voronoiPoints) {
+			this.voronoiPoints = voronoiPoints;
+		}
+
+		public void setVoronoiPointsColor(Color voronoiPointsColor) {
+			this.voronoiPointsColor = voronoiPointsColor;
+		}
+
+		public void setVoronoiPointsSize(int voronoiPointsSize) {
+			this.voronoiPointsSize = voronoiPointsSize;
+		}
+
+		public void setVoronoiPoints(boolean voronoiPoints, Color voronoiPointsColor, int
+				voronoiPointsSize) {
+			setVoronoiPoints(voronoiPoints);
+			setVoronoiPointsColor(voronoiPointsColor);
+			setVoronoiPointsSize(voronoiPointsSize);
 		}
 	}
 
