@@ -70,4 +70,21 @@ public class Executor {
 		supplier.execute();
 		return supplier.getOutput().getInEdge().getValue();
 	}
+
+	/**
+	 * Executes the given {@link ConsumerNode} with input.
+	 *
+	 * @param consumer
+	 * 		The {@link ConsumerNode}
+	 * @param input
+	 * 		The input of the {@link ConsumerNode}
+	 * @param <V>
+	 * 		Consumer class
+	 */
+	public static <V> void execute(ConsumerNode<V> consumer, V input) {
+		if (consumer.getInput().getOutEdge() == null)
+			new Edge<>(null, consumer.getInput());
+		consumer.getInput().getOutEdge().setValue(input);
+		consumer.execute();
+	}
 }
