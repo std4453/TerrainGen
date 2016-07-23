@@ -4,7 +4,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 /**
- *
+ * A {@code Grid} works like a 2-dimensional array. Notice that a {@code Grid} do not
+ * contain any information about where the {@code Grid} locates.
  */
 public class Grid {
 	private static final Log log = LogFactory.getLog(Grid.class);
@@ -73,5 +74,13 @@ public class Grid {
 			System.arraycopy(this.data[i], y, data2[i], 0, height);
 		}
 		return new Grid(data2);
+	}
+
+	public int getWidth() {
+		return this.width;
+	}
+
+	public int getHeight() {
+		return this.height;
 	}
 }
