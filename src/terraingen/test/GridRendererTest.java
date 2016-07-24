@@ -31,7 +31,7 @@ public class GridRendererTest {
 		int sampling = 5;
 		int sWidth = (width - 1) / sampling;
 		int sHeight = (height - 1) / sampling;
-		int x = 1, y = 1;
+		int x = 1, y;
 		double data[][] = new double[sWidth][sHeight];
 		for (int i = 0; i < sWidth; ++i, x += sampling) {
 			y = 1;
