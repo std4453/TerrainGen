@@ -3,7 +3,13 @@ package terraingen.backend.commons;
 import static terraingen.utils.MathUtils.floor;
 
 /**
+ * Implementation of
+ * <a href="https://en.wikipedia.org/wiki/Simplex_noise"><i>Simplex Noise</i></a>.<br />
+ * Currently copied from
+ * <a href="http://webstaff.itn.liu * .se/~stegu/simplexnoise/simplexnoise.pdf"> *
+ * this paper</a>, an own implementation of mine will come later.
  *
+ * @author Stefan Gustavson
  */
 public class SimplexNoise {
 	// Simplex noise in 2D, 3D and 4D

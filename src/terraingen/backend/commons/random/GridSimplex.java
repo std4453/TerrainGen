@@ -10,17 +10,10 @@ import java.util.Random;
 import static terraingen.utils.MathUtils.floor;
 
 /**
- * Implementation of
- * <a href="https://en.wikipedia.org/wiki/Simplex_noise"><i>Simplex Noise</i></a>.<br />
- * The generation part of the code is copied from the implementation of <i>Ken Perlin</i>.
- * I will implement it by myself later.<br />
- * Though the original algorithm can be applied to any dimension, the adapter part only
- * generates a 2D noise in forms of a {@linkplain terraingen.backend.commons.Grid Grid}.
- *
- * @author Ken Perlin
+ * Wrapper of {@link SimplexNoise}, provides features like reproducible randomness & auto
+ * conversion to {@link Grid}
  */
 public class GridSimplex implements IProcessor<Boundaries, Grid> {
-	// ADAPTER PART
 	protected long seed;
 	protected double interval;
 	protected Random random;
