@@ -60,7 +60,7 @@ public class MathUtils {
 				(point.y - original.top) / oHeight * tHeight + target.top);
 	}
 
-	public static int floor(double x) {
-		return x > 0 ? (int) x : (int) x - 1;
+	public static int floor(double n) {
+		return n > 0 ? (int) n : (int) n - 1;
 	}
 }
