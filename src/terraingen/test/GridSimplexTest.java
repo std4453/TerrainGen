@@ -16,7 +16,7 @@ public class GridSimplexTest {
 	public static void main(String[] args) {
 		DialogSingleImage.instance.show(Executor.execute(embrace(
 				create(() -> new Boundaries(10, 10)),
-				create(new GridSimplex(1, .01)),
+				create(new GridSimplex(.01)),
 				create(new GridRenderer())
 		)));
 	}

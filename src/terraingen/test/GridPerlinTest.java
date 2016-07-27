@@ -16,7 +16,7 @@ public class GridPerlinTest {
 	public static void main(String[] args) {
 		DialogSingleImage.instance.show(Executor.execute(embrace(
 				create(() -> new Boundaries(10, 10)),
-				create(new GridPerlin(1, .01)),
+				create(new GridPerlin(.01)),
 				create(new GridRenderer())
 		)));
 	}

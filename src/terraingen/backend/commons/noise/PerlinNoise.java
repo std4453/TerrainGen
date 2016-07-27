@@ -17,19 +17,26 @@ public class PerlinNoise {
 			{1, 1}, {-1, 1}, {1, -1}, {-1, -1},
 			{1, 0}, {-1, 0}, {0, 1}, {0, -1},
 	};
-	private static final long seed = 4453;
 
-	private static int permutation[] = new int[512];
+	public static final PerlinNoise instance = new PerlinNoise();
 
-	static {
-		Random random = new Random(seed);
-		for (int i = 0; i < 256; ++i)
-			permutation[i] = random.nextInt(256);
-		for (int i = 256; i < 512; ++i)
-			permutation[i] = permutation[i & 255];
+	protected int permutation[];
+
+	public PerlinNoise() {
+		this(0);
 	}
 
-	public static double noise(double x, double y) {
+	public PerlinNoise(long seed) {
+		this.permutation = new int[512];
+
+		Random random = new Random(seed);
+		for (int i = 0; i < 256; ++i)
+			this.permutation[i] = random.nextInt(256);
+		for (int i = 256; i < 512; ++i)
+			this.permutation[i] = this.permutation[i & 255];
+	}
+
+	public double noise(double x, double y) {
 		int i = floor(x), j = floor(y);
 		double u = x - i, v = y - j;
 		i &= 255;
@@ -51,11 +58,11 @@ public class PerlinNoise {
 	/**
 	 * The blending function with Horner's method
 	 */
-	private static double fade(double t) {
+	private double fade(double t) {
 		return ((6 * t - 15) * t + 10) * t * t * t;
 	}
 
-	private static double[] determineGradient(int x, int y) {
-		return gradients[permutation[permutation[x] + y] & 7];
+	private double[] determineGradient(int x, int y) {
+		return gradients[this.permutation[this.permutation[x] + y] & 7];
 	}
 }

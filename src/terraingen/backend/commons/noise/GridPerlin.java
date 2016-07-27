@@ -4,8 +4,6 @@ import terraingen.backend.commons.Boundaries;
 import terraingen.backend.commons.Grid;
 import terraingen.backend.nodegraph.IProcessor;
 
-import java.util.Random;
-
 import static terraingen.utils.MathUtils.floor;
 
 /**
@@ -13,15 +11,22 @@ import static terraingen.utils.MathUtils.floor;
  * features like reproducible randomness & auto conversion to {@link Grid}
  */
 public class GridPerlin implements IProcessor<Boundaries, Grid> {
-	protected long seed;
 	protected double interval;
-	protected Random random;
+	protected PerlinNoise noise;
+
+	public GridPerlin(PerlinNoise noise, double interval) {
+		if (noise == null)
+			noise = PerlinNoise.instance;
+		this.noise = noise;
+		this.interval = interval;
+	}
+
+	public GridPerlin(double interval) {
+		this(System.currentTimeMillis(), interval);
+	}
 
 	public GridPerlin(long seed, double interval) {
-		this.seed = seed;
-		this.interval = interval;
-
-		this.random = new Random(this.seed);
+		this(new PerlinNoise(seed), interval);
 	}
 
 	@Override
@@ -30,8 +35,6 @@ public class GridPerlin implements IProcessor<Boundaries, Grid> {
 		double y = input.top;
 		int width = floor((input.right - x) / this.interval) + 1;
 		int height = floor((input.bottom - y) / this.interval) + 1;
-		x += this.random.nextInt(32768) - 16384;
-		y += this.random.nextInt(32768) - 16384;
 		double yInitial = y;
 
 		double data[][] = new double[width][height];
@@ -41,7 +44,7 @@ public class GridPerlin implements IProcessor<Boundaries, Grid> {
 		for (int i = 0; i < width; ++i, x += this.interval) {
 			y = yInitial;
 			for (int j = 0; j < height; ++j, y += this.interval)
-				data[i][j] = PerlinNoise.noise(x, y);
+				data[i][j] = this.noise.noise(x, y);
 		}
 
 		return new Grid(data);

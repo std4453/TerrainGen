@@ -20,24 +20,30 @@ public class SimplexNoise {
 	private static final double p1 = unskewFactor;
 	private static final double p2 = 1d / 6 / p1;
 
-	// parameters
 	private static double gradients[][] = {
 			{1, 1}, {-1, 1}, {1, -1}, {-1, -1},
 			{1, 0}, {-1, 0}, {0, 1}, {0, -1},
 	};
-	private static final long seed = 4453;
 
-	private static int permutation[] = new int[512];
+	public static final SimplexNoise instance = new SimplexNoise();
 
-	static {
-		Random random = new Random(seed);
-		for (int i = 0; i < 256; ++i)
-			permutation[i] = random.nextInt(256);
-		for (int i = 256; i < 512; ++i)
-			permutation[i] = permutation[i & 255];
+	protected int permutation[];
+
+	public SimplexNoise() {
+		this(0);
 	}
 
-	public static double noise(final double x, final double y) {
+	public SimplexNoise(long seed) {
+		this.permutation = new int[512];
+
+		Random random = new Random(seed);
+		for (int i = 0; i < 256; ++i)
+			this.permutation[i] = random.nextInt(256);
+		for (int i = 256; i < 512; ++i)
+			this.permutation[i] = this.permutation[i & 255];
+	}
+
+	public double noise(final double x, final double y) {
 		// algorithm with only 2 multiplications
 		double k = (x + y) * skewFactor;
 		double m = k + x, n = k + y;
@@ -61,14 +67,14 @@ public class SimplexNoise {
 		return n0 + n1 + n2; // as can be scaled afterwards, no magic number needed
 	}
 
-	private static double[] determineGradient(int x, int y) {
-		return gradients[permutation[x + permutation[y]] & 7];
+	private double[] determineGradient(int x, int y) {
+		return gradients[this.permutation[x + this.permutation[y]] & 7];
 	}
 
 	/**
 	 * Ken Perlin's surflet
 	 */
-	private static double influence(double t, double n) {
+	private double influence(double t, double n) {
 		return t > 0 ? square(square(t)) * n : 0;
 	}
 }
