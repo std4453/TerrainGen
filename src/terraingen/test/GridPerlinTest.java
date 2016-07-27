@@ -15,7 +15,7 @@ import static terraingen.backend.nodegraph.NodeGraphHelper.embrace;
 public class GridPerlinTest {
 	public static void main(String[] args) {
 		DialogSingleImage.instance.show(Executor.execute(embrace(
-				create(() -> new Boundaries(-5, 5, -5, 5)),
+				create(() -> new Boundaries(10, 10)),
 				create(new GridPerlin(1, .01)),
 				create(new GridRenderer())
 		)));

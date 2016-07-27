@@ -2,6 +2,7 @@ package terraingen.backend.commons;
 
 import java.util.Random;
 
+import static terraingen.utils.MathUtils.dot;
 import static terraingen.utils.MathUtils.floor;
 
 /**
@@ -12,22 +13,27 @@ import static terraingen.utils.MathUtils.floor;
  * this paper</a>
  */
 public class PerlinNoise {
-	private static double[][] gradients = {
-			{-1, -1}, {-1, 0}, {-1, 1},
-			{0, -1}, {0, 1},
-			{1, -1}, {1, 0}, {1, 1},
+	private static double gradients[][] = {
+			{1, 1}, {-1, 1}, {1, -1}, {-1, -1},
+			{1, 0}, {-1, 0}, {0, 1}, {0, -1},
 	};
-	private static int permutation[] = new int[256];
+	private static final long seed = 4453;
+
+	private static int permutation[] = new int[512];
 
 	static {
-		Random random = new Random(4453);
+		Random random = new Random(seed);
 		for (int i = 0; i < 256; ++i)
 			permutation[i] = random.nextInt(256);
+		for (int i = 256; i < 512; ++i)
+			permutation[i] = permutation[i & 255];
 	}
 
 	public static double noise(double x, double y) {
 		int i = floor(x), j = floor(y);
 		double u = x - i, v = y - j;
+		i &= 255;
+		j &= 255;
 		double g00[] = determineGradient(i, j),
 				g01[] = determineGradient(i, j + 1),
 				g10[] = determineGradient(i + 1, j),
@@ -43,18 +49,13 @@ public class PerlinNoise {
 	}
 
 	/**
-	 * Calculates the blending function with Horner's method
+	 * The blending function with Horner's method
 	 */
 	private static double fade(double t) {
 		return ((6 * t - 15) * t + 10) * t * t * t;
 	}
 
-	private static double dot(double a[], double x, double y) {
-		return a[0] * x + a[1] * y;
-	}
-
 	private static double[] determineGradient(int x, int y) {
-		return gradients[permutation[(permutation[x & 255] + y) & 255] % gradients
-				.length];
+		return gradients[permutation[permutation[x] + y] & 7];
 	}
 }
