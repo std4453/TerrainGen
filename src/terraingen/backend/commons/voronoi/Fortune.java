@@ -11,6 +11,11 @@ import static terraingen.utils.MathUtils.abs;
 import static terraingen.utils.MathUtils.eps;
 import static terraingen.utils.MathUtils.square;
 
+/**
+ * Implementation of the Fortune's Algorithm, see
+ * <a href="https://en.wikipedia.org/wiki/Fortune's_Algorithm"><i>Fortune's
+ * Algorithm on Wikipedia</i></a>.
+ */
 public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 	/**
 	 * Arc describes a section of a parabola, with two breakpoints ( could be null )
@@ -361,16 +366,6 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 		}
 	}
 
-	/**
-	 * Main process of the Fortune's Algorithm, see
-	 * <a href="https://en.wikipedia.org/wiki/Fortune's_Algorithm"><i>Fortune's
-	 * Algorithm on Wikipedia</i></a> for more detail.
-	 *
-	 * @param input
-	 * 		{@link PointBox}
-	 *
-	 * @return {@link VoronoiBox}
-	 */
 	@Override
 	public VoronoiBox process(PointBox input) {
 		Context context = new Context(input);
