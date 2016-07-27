@@ -63,4 +63,8 @@ public class MathUtils {
 	public static int floor(double n) {
 		return n > 0 ? (int) n : (int) n - 1;
 	}
+
+	public static double dot(double n[], double x, double y) {
+		return n[0] * x + n[1] * y;
+	}
 }
