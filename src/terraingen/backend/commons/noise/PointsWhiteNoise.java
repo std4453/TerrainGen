@@ -1,4 +1,4 @@
-package terraingen.backend.commons.random;
+package terraingen.backend.commons.noise;
 
 import terraingen.backend.commons.Boundaries;
 import terraingen.backend.commons.Point;
@@ -11,7 +11,7 @@ import java.util.Random;
 import java.util.Vector;
 
 /**
- *
+ * Generates a {@link PointBox} with completely random points, i.e., white noise.
  */
 public class PointsWhiteNoise implements IProcessor<Long, PointBox>,
 		ISupplier<PointBox> {

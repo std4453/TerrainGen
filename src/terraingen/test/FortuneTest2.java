@@ -3,7 +3,7 @@ package terraingen.test;
 import terraingen.backend.commons.Boundaries;
 import terraingen.backend.commons.Point;
 import terraingen.backend.commons.PointBox;
-import terraingen.backend.commons.random.PointsWhiteNoise;
+import terraingen.backend.commons.noise.PointsWhiteNoise;
 import terraingen.backend.commons.voronoi.Fortune;
 import terraingen.backend.commons.voronoi.VoronoiBox;
 import terraingen.backend.commons.voronoi.VoronoiRenderer;

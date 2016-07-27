@@ -2,7 +2,7 @@ package terraingen.test;
 
 import terraingen.backend.commons.Boundaries;
 import terraingen.backend.commons.GridRenderer;
-import terraingen.backend.commons.random.GridPerlin;
+import terraingen.backend.commons.noise.GridPerlin;
 import terraingen.backend.nodegraph.Executor;
 import terraingen.frontend.dialog.DialogSingleImage;
 

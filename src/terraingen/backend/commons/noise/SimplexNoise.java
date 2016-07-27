@@ -1,4 +1,4 @@
-package terraingen.backend.commons;
+package terraingen.backend.commons.noise;
 
 import java.util.Random;
 

@@ -1,6 +1,8 @@
-package terraingen.backend.commons;
+package terraingen.backend.commons.voronoi;
 
-import terraingen.backend.commons.voronoi.VoronoiBox;
+import terraingen.backend.commons.Boundaries;
+import terraingen.backend.commons.Point;
+import terraingen.backend.commons.PointBox;
 import terraingen.backend.nodegraph.IProcessor;
 
 import java.util.*;
@@ -8,10 +10,15 @@ import java.util.*;
 import static terraingen.utils.MathUtils.max;
 import static terraingen.utils.MathUtils.min;
 
+/**
+ * Implementation of Lloyd's Algorithm, see
+ * <a href="https://en.wikipedia.org/wiki/Lloyd%27s_algorithm"><i>Lloyd's
+ * Algorithm</i></a>
+ */
 public class Lloyd implements IProcessor<VoronoiBox, PointBox> {
 	@Override
 	public PointBox process(VoronoiBox input) {
-		Boundaries boundaries = input.boundaries;
+		Boundaries boundaries = input.getBoundaries();
 		List<Point> points = new Vector<>();
 
 		for (VoronoiBox.Cell cell : input.getCells())

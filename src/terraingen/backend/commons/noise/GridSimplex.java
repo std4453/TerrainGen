@@ -1,8 +1,7 @@
-package terraingen.backend.commons.random;
+package terraingen.backend.commons.noise;
 
 import terraingen.backend.commons.Boundaries;
 import terraingen.backend.commons.Grid;
-import terraingen.backend.commons.PerlinNoise;
 import terraingen.backend.nodegraph.IProcessor;
 
 import java.util.Random;
@@ -10,15 +9,15 @@ import java.util.Random;
 import static terraingen.utils.MathUtils.floor;
 
 /**
- * Wrapper of {@linkplain terraingen.backend.commons.PerlinNoise PerlinNoise}, provides
- * features like reproducible randomness & auto conversion to {@link Grid}
+ * Wrapper of {@link SimplexNoise}, provides features like reproducible randomness & auto
+ * conversion to {@link Grid}
  */
-public class GridPerlin implements IProcessor<Boundaries, Grid> {
+public class GridSimplex implements IProcessor<Boundaries, Grid> {
 	protected long seed;
 	protected double interval;
 	protected Random random;
 
-	public GridPerlin(long seed, double interval) {
+	public GridSimplex(long seed, double interval) {
 		this.seed = seed;
 		this.interval = interval;
 
@@ -42,7 +41,7 @@ public class GridPerlin implements IProcessor<Boundaries, Grid> {
 		for (int i = 0; i < width; ++i, x += this.interval) {
 			y = yInitial;
 			for (int j = 0; j < height; ++j, y += this.interval)
-				data[i][j] = PerlinNoise.noise(x, y);
+				data[i][j] = SimplexNoise.noise(x, y);
 		}
 
 		return new Grid(data);

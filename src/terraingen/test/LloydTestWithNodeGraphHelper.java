@@ -1,9 +1,9 @@
 package terraingen.test;
 
 import terraingen.backend.commons.Boundaries;
-import terraingen.backend.commons.Lloyd;
-import terraingen.backend.commons.random.PointsWhiteNoise;
+import terraingen.backend.commons.noise.PointsWhiteNoise;
 import terraingen.backend.commons.voronoi.Fortune;
+import terraingen.backend.commons.voronoi.Lloyd;
 import terraingen.backend.commons.voronoi.VoronoiRenderer;
 import terraingen.backend.nodegraph.Executor;
 import terraingen.backend.nodegraph.IProcessor;
