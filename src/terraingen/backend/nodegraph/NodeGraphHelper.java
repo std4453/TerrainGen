@@ -18,7 +18,10 @@ public class NodeGraphHelper {
 		return new CombinerNode<>(combiner);
 	}
 
-	public static <V> ConsumerNode<V> create(IConsumer<V> consumer) {
+	/**
+	 * For convenience, not to become ambiguous with {@link #create(IProcessor)}
+	 */
+	public static <V> ConsumerNode<V> createConsumer(IConsumer<V> consumer) {
 		return new ConsumerNode<>(consumer);
 	}
 
@@ -121,6 +124,21 @@ public class NodeGraphHelper {
 					new Statement(getInput(head), getOutput(nodes[nodes.length - 2]))));
 		}
 		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	public static Statement embraceStatement(Object... nodes) {
+		return (Statement) embrace((Object[]) nodes);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static SupplierNode embraceSupplier(Object... nodes) {
+		return (SupplierNode) embrace(nodes);
+	}
+
+	@SuppressWarnings("unchecked")
+	public static ConsumerNode embraceConsumer(Object... nodes) {
+		return (ConsumerNode) embrace(nodes);
 	}
 
 	private static boolean isInput(Object obj) {
