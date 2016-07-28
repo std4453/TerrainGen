@@ -1,4 +1,4 @@
-package terraingen.backend.commons;
+package terraingen.backend.commons.grid;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

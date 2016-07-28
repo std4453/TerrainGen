@@ -1,4 +1,4 @@
-package terraingen.backend.commons;
+package terraingen.backend.commons.grid;
 
 import terraingen.backend.nodegraph.Executor;
 import terraingen.backend.nodegraph.IProcessor;

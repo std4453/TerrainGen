@@ -2,8 +2,8 @@ package terraingen.test;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import terraingen.backend.commons.Grid;
-import terraingen.backend.commons.GridRenderer;
+import terraingen.backend.commons.grid.Grid;
+import terraingen.backend.commons.grid.GridRenderer;
 import terraingen.backend.nodegraph.Executor;
 import terraingen.frontend.dialog.DialogSingleImage;
 import terraingen.utils.ImageUtils;

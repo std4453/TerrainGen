@@ -1,7 +1,8 @@
-package terraingen.backend.commons;
+package terraingen.backend.commons.grid;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import terraingen.backend.commons.Boundaries;
 import terraingen.backend.nodegraph.IProcessor;
 import terraingen.utils.MathUtils;
 
@@ -84,7 +85,8 @@ public class GridRenderer implements IProcessor<Grid, BufferedImage> {
 		double rHeight = image.getHeight() / height;
 		for (int i = 0; i < width; ++i)
 			for (int j = 0; j < height; ++j) {
-				Point renderCenter = MathUtils.transform(inputBoundaries, new Point(i, j)
+				terraingen.backend.commons.Point renderCenter = MathUtils.transform(
+						inputBoundaries, new terraingen.backend.commons.Point(i, j)
 						, imageBoundaries);
 				double value = input.get(i, j);
 				Color color = interpolate(min, max, value, color1, color2);

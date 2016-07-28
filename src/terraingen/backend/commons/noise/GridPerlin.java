@@ -1,7 +1,7 @@
 package terraingen.backend.commons.noise;
 
 import terraingen.backend.commons.Boundaries;
-import terraingen.backend.commons.Grid;
+import terraingen.backend.commons.grid.Grid;
 import terraingen.backend.nodegraph.IProcessor;
 
 import static terraingen.utils.MathUtils.floor;

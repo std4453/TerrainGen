@@ -1,7 +1,7 @@
 package terraingen.test;
 
 import terraingen.backend.commons.Boundaries;
-import terraingen.backend.commons.GridRenderer;
+import terraingen.backend.commons.grid.GridRenderer;
 import terraingen.backend.commons.noise.GridSimplex;
 import terraingen.backend.nodegraph.Executor;
 import terraingen.frontend.dialog.DialogSingleImage;
