@@ -13,6 +13,9 @@ public class Grid {
 	protected double data[][];
 	protected int width, height;
 
+	protected double min, max;
+	protected boolean minmaxValid = false;
+
 	public Grid(int width, int height) {
 		this.width = width;
 		this.height = height;
@@ -61,8 +64,10 @@ public class Grid {
 	}
 
 	public void set(int x, int y, double value) {
-		if (inBoundaries(x, y))
+		if (inBoundaries(x, y)) {
 			this.data[x][y] = value;
+			this.minmaxValid = false;
+		}
 	}
 
 	public Grid get(int x, int y, int width, int height) {
@@ -82,5 +87,36 @@ public class Grid {
 
 	public int getHeight() {
 		return this.height;
+	}
+
+	public double getMin() {
+		if (this.minmaxValid)
+			return this.min;
+
+		calcMinMax();
+		return this.min;
+	}
+
+	public double getMax() {
+		if (this.minmaxValid)
+			return this.max;
+
+		calcMinMax();
+		return this.max;
+	}
+
+	protected void calcMinMax() {
+		double min = Double.POSITIVE_INFINITY;
+		double max = Double.NEGATIVE_INFINITY;
+		for (int i = 0; i < this.width; ++i)
+			for (int j = 0; j < this.height; ++j) {
+				double value = get(i, j);
+				if (value < min)
+					min = value;
+				if (value > max)
+					max = value;
+			}
+
+		this.minmaxValid = true;
 	}
 }

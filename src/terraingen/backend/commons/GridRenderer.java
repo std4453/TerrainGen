@@ -43,21 +43,10 @@ public class GridRenderer implements IProcessor<Grid, BufferedImage> {
 	}
 
 	public static void renderToImage(Grid input, BufferedImage image) {
-		// calculates the minimum and maximum value of the Grid
-		double min = Double.POSITIVE_INFINITY;
-		double max = Double.NEGATIVE_INFINITY;
-		int width = input.getWidth();
-		int height = input.getHeight();
-		for (int i = 0; i < width; ++i)
-			for (int j = 0; j < height; ++j) {
-				double value = input.get(i, j);
-				if (value < min)
-					min = value;
-				if (value > max)
-					max = value;
-			}
-
-		renderToImage(min, max, input, image);
+		if (input != null)
+			renderToImage(input.getMin(), input.getMax(), input, image);
+		else
+			log.warn("Null grid given.");
 	}
 
 	public static void renderToImage(double min, double max, Grid input,
