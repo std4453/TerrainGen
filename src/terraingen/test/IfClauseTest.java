@@ -1,41 +1,27 @@
 package terraingen.test;
 
-import terraingen.backend.nodegraph.*;
+import terraingen.backend.nodegraph.Executor;
+import terraingen.backend.nodegraph.IfClause;
+
+import static terraingen.backend.nodegraph.NodeGraphHelper.create;
+import static terraingen.backend.nodegraph.NodeGraphHelper.embraceStatement;
 
 /**
  *
  */
 public class IfClauseTest {
+	@SuppressWarnings("unchecked")
 	public static void main(String[] args) {
-		ProcessorNode<Integer, Boolean> conditioner = new ProcessorNode<>(
-				new IProcessor<Integer, Boolean>() {
-					@Override
-					public Boolean process(Integer input) {
-						return input % 2 == 0;
-					}
-				});
-		ProcessorNode<Integer, String> route1 = new ProcessorNode<>(
-				new IProcessor<Integer, String>() {
-					@Override
-					public String process(Integer input) {
-						return String.format("%s is an even number", input);
-					}
-				});
-		ProcessorNode<Integer, String> route2 = new ProcessorNode<>(
-				new IProcessor<Integer, String>() {
-					@Override
-					public String process(Integer input) {
-						return String.format("%s is an odd number", input);
-					}
-				});
 		IfClause<Integer, String> ifClause = new IfClause<>(
-				new Statement<>(conditioner.getInput(), conditioner.getOutput()),
-				new Statement<>(route1.getInput(), route1.getOutput()),
-				new Statement<>(route2.getInput(), route2.getOutput()));
+				embraceStatement(create((Integer n) -> n % 2 == 0)),
+				embraceStatement(create(
+						(str) -> String.format("%s is an even number", str))),
+				embraceStatement(create(
+						(str) -> String.format("%s is ann odd number", str))));
+
 		for (int i = 1; i <= 10; ++i) {
 			System.out.println(String.format("Input number %d:", i));
-			String output = Executor.execute(ifClause, i);
-			System.out.println(output);
+			System.out.println(Executor.execute(ifClause, i));
 		}
 	}
 }

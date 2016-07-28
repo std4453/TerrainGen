@@ -1,14 +1,20 @@
 package terraingen.test;
 
-import terraingen.backend.nodegraph.*;
+import terraingen.backend.nodegraph.Executor;
+import terraingen.backend.nodegraph.Statement;
+import terraingen.backend.nodegraph.SwitchClause;
 
 import java.util.HashMap;
 import java.util.Map;
+
+import static terraingen.backend.nodegraph.NodeGraphHelper.create;
+import static terraingen.backend.nodegraph.NodeGraphHelper.embraceStatement;
 
 /**
  *
  */
 public class SwitchClauseTest {
+	@SuppressWarnings("unchecked")
 	public static void main(String[] args) {
 		final String[] months = {
 				"January", "February", "March",
@@ -23,14 +29,13 @@ public class SwitchClauseTest {
 				"Winter", "Winter", "Winter",
 		};
 
-		IProcessor<Integer, String> processor = input -> String.format("%s is in %s.",
-				months[input], seasons[input]);
-		IProcessor<Integer, String> mapper = input -> seasons[input];
 		Map<String, Statement<Integer, String>> routes = new HashMap<>();
 		for (int i = 0; i < 12; i += 3)
-			routes.put(seasons[i], new Statement<>(new ProcessorNode<>(processor)));
-		SwitchClause<String, Integer, String> switchClause = new SwitchClause<>(new
-				Statement<>(new ProcessorNode<>(mapper)), routes);
+			routes.put(seasons[i], embraceStatement(create(
+					(Integer input) -> String.format("%s is in %s.", months[input],
+							seasons[input]))));
+		SwitchClause<String, Integer, String> switchClause = new SwitchClause<>(
+				embraceStatement(create((Integer input) -> seasons[input])), routes);
 		Statement<Integer, String> switchClauseStatement = new Statement<>(switchClause);
 
 		for (int i = 0; i < 12; ++i)

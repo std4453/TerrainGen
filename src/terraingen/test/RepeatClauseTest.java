@@ -1,19 +1,18 @@
 package terraingen.test;
 
-import terraingen.backend.nodegraph.*;
+import terraingen.backend.nodegraph.Executor;
+import terraingen.backend.nodegraph.RepeatClause;
+
+import static terraingen.backend.nodegraph.NodeGraphHelper.create;
+import static terraingen.backend.nodegraph.NodeGraphHelper.embraceStatement;
 
 /**
  *
  */
 public class RepeatClauseTest {
+	@SuppressWarnings("unchecked")
 	public static void main(String[] args) {
-		RepeatClause<Integer> repeatClause = new RepeatClause<>(8,
-				new Statement<>(new ProcessorNode<>(new IProcessor<Integer, Integer>() {
-					@Override
-					public Integer process(Integer input) {
-						return input * 2;
-					}
-				})));
-		System.out.println(Executor.execute(repeatClause, 1));    // 256
+		System.out.println((Integer) Executor.execute(new RepeatClause<>(8,
+				embraceStatement(create((Integer n) -> n * 2))), 1));    // 256
 	}
 }

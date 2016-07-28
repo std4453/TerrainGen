@@ -1,7 +1,6 @@
 package terraingen.test;
 
 import terraingen.backend.commons.Boundaries;
-import terraingen.backend.commons.PointBox;
 import terraingen.backend.commons.noise.PointsWhiteNoise;
 import terraingen.backend.commons.voronoi.Fortune;
 import terraingen.backend.commons.voronoi.Lloyd;
@@ -12,30 +11,21 @@ import terraingen.frontend.dialog.DialogSingleImage;
 
 import java.awt.image.BufferedImage;
 
+import static terraingen.backend.nodegraph.NodeGraphHelper.create;
+import static terraingen.backend.nodegraph.NodeGraphHelper.embrace;
+
 public class LloydTest {
+	@SuppressWarnings("unchecked")
 	public static void main(String[] args) {
-		ProcessorNode<VoronoiBox, PointBox> lloyd = new ProcessorNode<>(new Lloyd());
-		ProcessorNode<PointBox, VoronoiBox> voronoi = new ProcessorNode<>(new Fortune());
-		new Edge<>(lloyd.getOutput(), voronoi.getInput());
-		Statement<VoronoiBox, VoronoiBox> whole = new Statement<>
-				(lloyd.getInput(), voronoi.getOutput());
-
-		final int points = 100;
-		final long seed = 4453;
-		Boundaries boundaries = new Boundaries(0, 100, 0, 100);
-		ProcessorNode<Long, PointBox> random = new ProcessorNode<>(new PointsWhiteNoise
-				(boundaries, points));
-		ProcessorNode<PointBox, VoronoiBox> voronoi2 = new ProcessorNode<>(new Fortune());
-		new Edge<>(random.getOutput(), voronoi2.getInput());
-		VoronoiBox voronoiBox = Executor.execute(new Statement<>(random.getInput(),
-				voronoi2.getOutput()), seed);
-
-		RepeatClause<VoronoiBox> repeatClause = new RepeatClause<>(10, whole);
-		VoronoiBox lloydResult = Executor.execute(new Statement<>(repeatClause),
-				voronoiBox);
-
-		BufferedImage image = Executor.execute(new Statement<>(new ProcessorNode<>(new
-				VoronoiRenderer())), lloydResult);
-		DialogSingleImage.instance.show(image);
+		DialogSingleImage.instance.show(Executor.execute(
+				(SupplierNode<BufferedImage>) embrace(
+						create(() -> 4453L),
+						create((IProcessor) new PointsWhiteNoise(new Boundaries(100, 100),
+								100)),
+						create(new Fortune()),
+						new RepeatClause(50, (Statement<VoronoiBox, VoronoiBox>)
+								embrace(create(new Lloyd()), create(new Fortune()))),
+						create(new VoronoiRenderer())
+				)));
 	}
 }
