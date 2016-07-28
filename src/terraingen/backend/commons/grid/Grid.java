@@ -116,6 +116,8 @@ public class Grid {
 				if (value > max)
 					max = value;
 			}
+		this.min = min;
+		this.max = max;
 
 		this.minmaxValid = true;
 	}
