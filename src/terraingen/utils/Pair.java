@@ -40,4 +40,20 @@ public class Pair<A, B> {
 		this.a = a;
 		this.b = b;
 	}
+
+	/**
+	 * Auto-generated {@code equals()}
+	 */
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		Pair<?, ?> pair = (Pair<?, ?>) o;
+
+		return this.a != null ? this.a.equals(
+				pair.a) : pair.a == null && (this.b != null ? this.b.equals(
+				pair.b) : pair.b == null);
+
+	}
 }
