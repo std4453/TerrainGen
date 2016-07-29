@@ -2,12 +2,12 @@ package terraingen.backend.algorithms.amitp;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import terraingen.backend.commons.Boundaries;
 import terraingen.backend.commons.Point;
 import terraingen.backend.commons.voronoi.VoronoiBox;
+import terraingen.utils.MathUtils;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  * Map used in the algorithm described
@@ -71,6 +71,14 @@ public class Map {
 			this.s2 = s2;
 			this.s3 = s3;
 		}
+
+		public Object getData(String key) {
+			return this.data.get(key);
+		}
+
+		public void setData(String key, Object obj) {
+			this.data.put(key, obj);
+		}
 	}
 
 	/**
@@ -82,12 +90,37 @@ public class Map {
 	 */
 	protected static class Center {
 		/**
+		 * Sort {@linkplain Corner Corners}
+		 */
+		private static class CornerComparator implements Comparator<Corner> {
+			protected Center center;
+
+			public CornerComparator(Center center) {
+				this.center = center;
+			}
+
+			@Override
+			public int compare(Corner o1, Corner o2) {
+				if (o1 == o2)
+					return 0;
+				if (o1 == null)
+					return -1;
+				if (o2 == null)
+					return 1;
+
+				double a1 = MathUtils.angle(this.center.point, o1.point);
+				double a2 = MathUtils.angle(this.center.point, o2.point);
+				return Double.compare(a1, a2);
+			}
+		}
+
+		/**
 		 * Additional data
 		 */
 		public java.util.Map<String, Object> data = new HashMap<>();
 
 		public List<Edge> edges;
-		public List<Corner> corners;
+		public Collection<Corner> corners;
 
 		/**
 		 * Site point of cell.
@@ -98,7 +131,15 @@ public class Map {
 			this.point = point;
 
 			this.edges = new ArrayList<>();
-			this.corners = new ArrayList<>();
+			this.corners = new TreeSet<>(new CornerComparator(this));
+		}
+
+		public Object getData(String key) {
+			return this.data.get(key);
+		}
+
+		public void setData(String key, Object obj) {
+			this.data.put(key, obj);
 		}
 	}
 
@@ -106,7 +147,7 @@ public class Map {
 		/**
 		 * Additional data
 		 */
-		public java.util.Map<String, Object> objects = new HashMap<>();
+		public java.util.Map<String, Object> data = new HashMap<>();
 
 		public Center s1, s2;
 		/**
@@ -147,7 +188,17 @@ public class Map {
 		public Center otherCenter(Center center) {
 			return this.s1 == center ? this.s2 : this.s2 == center ? this.s1 : null;
 		}
+
+		public Object getData(String key) {
+			return this.data.get(key);
+		}
+
+		public void setData(String key, Object obj) {
+			this.data.put(key, obj);
+		}
 	}
+
+	protected Boundaries boundaries;
 
 	protected List<Center> centers;
 	protected List<Corner> corners;
@@ -170,6 +221,8 @@ public class Map {
 	 */
 	public Map(VoronoiBox voronoiBox) {
 		this();
+
+		this.boundaries = new Boundaries(voronoiBox.getBoundaries());
 
 		// fast lookup maps
 		java.util.Map<VoronoiBox.Cell, Center> cell2center = new HashMap<>();
@@ -244,5 +297,22 @@ public class Map {
 						s12 == s21 ? s12 :
 								s12 == s22 ? s12 :
 										null;
+	}
+
+	public Boundaries getBoundaries() {
+		return this.boundaries;
+	}
+
+
+	public List<Center> getCenters() {
+		return this.centers;
+	}
+
+	public List<Corner> getCorners() {
+		return this.corners;
+	}
+
+	public List<Edge> getEdges() {
+		return this.edges;
 	}
 }
