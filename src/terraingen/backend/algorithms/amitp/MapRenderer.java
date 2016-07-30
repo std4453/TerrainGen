@@ -383,6 +383,8 @@ public class MapRenderer implements IProcessor<Map, BufferedImage> {
 
 		// render edges
 		for (Map.Edge edge : map.getEdges()) {
+			if (edge.c1 == null || edge.c2 == null)
+				continue;
 			g.setColor(shader.colorizeEdge(map, edge));
 			g.setStroke(new BasicStroke(shader.getEdgeWidth(map, edge)));
 

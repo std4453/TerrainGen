@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import terraingen.backend.commons.Boundaries;
 import terraingen.backend.commons.Point;
 import terraingen.backend.commons.voronoi.VoronoiBox;
+import terraingen.backend.nodegraph.IProcessor;
 import terraingen.utils.MathUtils;
 
 import java.util.*;
@@ -16,6 +17,8 @@ import java.util.*;
  */
 public class Map {
 	private static final Log log = LogFactory.getLog(Map.class);
+
+	public static final IProcessor<VoronoiBox, Map> mapConverter = Map::new;
 
 	/**
 	 * A {@code Corner} represents in the same time a voronoi point and a triangle in a
@@ -261,6 +264,12 @@ public class Map {
 			List<Edge> edgesList = entry.getValue();
 			if (edgesList.size() < 3) {
 				log.debug("Corner have less than 3 edges connected.");
+				for (Edge edge : edgesList) {
+					Corner corner = new Corner(edge, null, null, entry.getKey());
+					edge.setCorner(corner);
+					edge.s1.corners.add(corner);
+					edge.s2.corners.add(corner);
+				}
 				continue;
 			}
 
@@ -290,6 +299,7 @@ public class Map {
 	 * Returns the same {@linkplain Center Center} which the two {@linkplain Edge Edges}
 	 * possess at the same time, if, there is such one.
 	 */
+
 	private Center intersection(Edge e1, Edge e2) {
 		Center s11 = e1.s1, s12 = e1.s2, s21 = e2.s1, s22 = e2.s2;
 		return s11 == s21 ? s11 :

@@ -73,11 +73,23 @@ public class Boundaries {
 
 	public boolean inBoundaries(Point point) {
 		return point.x >= this.left && point.x <= this.right && point.y >= this.top &&
-				point.y >= this.bottom;
+				point.y <= this.bottom;
 	}
 
 	public Boundaries expend(double n) {
 		return new Boundaries(this.top - n, this.bottom + n, this.left - n,
 				this.right + n);
+	}
+
+	public Point center() {
+		return this.point(.5d, .5d);
+	}
+
+	/**
+	 * Get linear interpolated point in {@code Boundaries}
+	 */
+	public Point point(double u, double v) {
+		return new Point(this.left * (1 - u) + this.right * u,
+				this.top * (1 - v) + this.bottom * v);
 	}
 }

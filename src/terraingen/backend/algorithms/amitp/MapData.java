@@ -86,7 +86,7 @@ public class MapData {
 		RIVER, NON_RIVER;
 
 		public static final String key = "river";
-		private static final DataRiver def = NON_RIVER;
+		public static final DataRiver def = NON_RIVER;
 
 		public static DataRiver get(Map.Edge edge) {
 			DataRiver dataRiver = (DataRiver) edge.getData(key);
@@ -103,7 +103,7 @@ public class MapData {
 	 */
 	public static class DataMoisture {
 		public static final String key = "moisture";
-		private static final double def = 0d;
+		public static final double def = 0d;
 
 		public static double get(Map.Center center) {
 			Double moisture = (Double) center.getData(key);
@@ -136,7 +136,7 @@ public class MapData {
 		OCEAN, LAKE, BEACH;
 
 		public static final String key = "moisture";
-		private static final DataBiome def = GRASSLAND;
+		public static final DataBiome def = GRASSLAND;
 
 		public static DataBiome get(Map.Center center) {
 			DataBiome biome = (DataBiome) center.getData(key);

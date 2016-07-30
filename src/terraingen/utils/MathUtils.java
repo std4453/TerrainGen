@@ -67,4 +67,12 @@ public class MathUtils {
 	public static double dot(double n[], double x, double y) {
 		return n[0] * x + n[1] * y;
 	}
+
+	public static double distance(Point a, Point b) {
+		return sqrt(square(a.x - b.x) + square(a.y - b.y));
+	}
+
+	public static double length(Point a) {
+		return sqrt(square(a.x) + square(a.y));
+	}
 }
