@@ -208,22 +208,15 @@ public class Map {
 	protected List<Edge> edges;
 
 	/**
-	 * Only initialize instance fields.
-	 */
-	private Map() {
-		this.centers = new ArrayList<>();
-		this.corners = new ArrayList<>();
-		this.edges = new ArrayList<>();
-	}
-
-	/**
 	 * Takes a {@link VoronoiBox} as input and construct the data structure of the map.
 	 *
 	 * @param voronoiBox
 	 * 		The input
 	 */
 	public Map(VoronoiBox voronoiBox) {
-		this();
+		this.centers = new ArrayList<>();
+		this.corners = new ArrayList<>();
+		this.edges = new ArrayList<>();
 
 		this.boundaries = new Boundaries(voronoiBox.getBoundaries());
 
