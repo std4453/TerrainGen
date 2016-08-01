@@ -44,11 +44,11 @@ public class MapData {
 		}
 
 		public static void set(Map.Center center, DataIsland dataIsland) {
-			if (dataIsland != null) center.setData(key, dataIsland);
+			center.setData(key, dataIsland);
 		}
 
 		public static void set(Map.Corner corner, DataIsland dataIsland) {
-			if (dataIsland != null) corner.setData(key, dataIsland);
+			corner.setData(key, dataIsland);
 		}
 	}
 
@@ -94,7 +94,7 @@ public class MapData {
 		}
 
 		public static void set(Map.Edge edge, DataRiver dataRiver) {
-			if (dataRiver != null) edge.setData(key, dataRiver);
+			edge.setData(key, dataRiver);
 		}
 	}
 
@@ -145,6 +145,83 @@ public class MapData {
 
 		public static void set(Map.Center center, DataBiome dataBiome) {
 			center.setData(key, dataBiome);
+		}
+	}
+
+	/**
+	 * Target: Center, Corner, Edge<br />
+	 * Any additional data to assign to components of the {@link Map}.
+	 */
+	public static class DataAny {
+		public static Object get(Map.Center center, String key, Object def) {
+			Object obj = center.getData(key);
+			return obj == null ? def : obj;
+		}
+
+		public static Object get(Map.Center center, String key) {
+			return get(center, key, null);
+		}
+
+		public static Object get(Map.Corner corner, String key, Object def) {
+			Object obj = corner.getData(key);
+			return obj == null ? def : obj;
+		}
+
+		public static Object get(Map.Corner corner, String key) {
+			return get(corner, key, null);
+		}
+
+		public static Object get(Map.Edge edge, String key, Object def) {
+			Object obj = edge.getData(key);
+			return obj == null ? def : obj;
+		}
+
+		public static Object get(Map.Edge edge, String key) {
+			return get(edge, key, null);
+		}
+
+		public static void set(Map.Center center, String key, Object obj) {
+			center.setData(key, obj);
+		}
+
+		public static void set(Map.Corner corner, String key, Object obj) {
+			corner.setData(key, obj);
+		}
+
+		public static void set(Map.Edge edge, String key, Object obj) {
+			edge.setData(key, obj);
+		}
+
+		public static void remove(Map.Center center, String key) {
+			center.removeData(key);
+		}
+
+		public static void remove(Map.Corner corner, String key) {
+			corner.removeData(key);
+		}
+
+		public static void remove(Map.Edge edge, String key) {
+			edge.removeData(key);
+		}
+	}
+
+	/**
+	 * Target: Center<br />
+	 * Whether the cell is a border cell or not.
+	 */
+	public enum DataBorder {
+		BORDER, CENTER;
+
+		private static final String key = "border";
+		private static final DataBorder def = CENTER;
+
+		public static DataBorder get(Map.Center center) {
+			DataBorder border = (DataBorder) center.getData(key);
+			return border == null ? def : border;
+		}
+
+		public static void set(Map.Center center, DataBorder border) {
+			center.setData(key, border);
 		}
 	}
 }

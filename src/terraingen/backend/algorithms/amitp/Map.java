@@ -82,6 +82,10 @@ public class Map {
 		public void setData(String key, Object obj) {
 			this.data.put(key, obj);
 		}
+
+		public void removeData(String key) {
+			this.data.remove(key);
+		}
 	}
 
 	/**
@@ -144,6 +148,10 @@ public class Map {
 		public void setData(String key, Object obj) {
 			this.data.put(key, obj);
 		}
+
+		public void removeData(String key) {
+			this.data.remove(key);
+		}
 	}
 
 	protected static class Edge {
@@ -198,6 +206,10 @@ public class Map {
 
 		public void setData(String key, Object obj) {
 			this.data.put(key, obj);
+		}
+
+		public void removeData(String key) {
+			this.data.remove(key);
 		}
 	}
 
@@ -262,6 +274,10 @@ public class Map {
 					edge.setCorner(corner);
 					edge.s1.corners.add(corner);
 					edge.s2.corners.add(corner);
+
+					// set cells connected to the edge as border cell
+					MapData.DataBorder.set(edge.s1, MapData.DataBorder.BORDER);
+					MapData.DataBorder.set(edge.s2, MapData.DataBorder.BORDER);
 				}
 				continue;
 			}
