@@ -1,5 +1,6 @@
 package terraingen.backend.algorithms.amitp;
 
+import terraingen.backend.commons.BFSQueue;
 import terraingen.backend.commons.Boundaries;
 import terraingen.backend.commons.Point;
 import terraingen.backend.commons.grid.Grid;
@@ -103,7 +104,6 @@ public class IslandBuilder implements IProcessor<Map, Map> {
 	}
 
 	@Override
-
 	public Map process(Map input) {
 		Boundaries mapBoundaries = input.getBoundaries();
 		for (Map.Corner corner : input.getCorners()) {
@@ -130,6 +130,45 @@ public class IslandBuilder implements IProcessor<Map, Map> {
 			MapData.DataIsland.set(center, island);
 		}
 
+		// IslandBuilder calculates whether a cell is a lake cell by means that:
+		// 1. Floodfill every border cell so that the the OCEAN region is determined.
+		// 2. Search for any not floodfill-ed OCEAN cell and set it to be LAKE.
+		for (Map.Center center : input.getCenters())
+			if (isBorderCell(input, center))
+				floodfill(input, center);
+		for (Map.Center center : input.getCenters()) {
+			if (MapData.DataIsland.get(center) == MapData.DataIsland.OCEAN &&
+					MapData.DataAny.get(center, FLOODFILLED_KEY) == null)
+				MapData.DataIsland.set(center, MapData.DataIsland.LAKE);
+			MapData.DataAny.remove(center, FLOODFILLED_KEY);
+		}
+
 		return input;
+	}
+
+	// temporary keys used in floodfilling
+	private static final String FLOODFILLED_KEY = "floodfilled";
+
+	private void floodfill(Map map, Map.Center center) {
+		// Floodfill uses BFS to a stack overflow ( in case number of cells may become
+		// very big )
+		BFSQueue<Map.Center> queue = new BFSQueue<>();
+		if (MapData.DataAny.get(center, FLOODFILLED_KEY) == null)
+			queue.offer(center);
+		MapData.DataIsland data = MapData.DataIsland.get(center);
+		while (!queue.isEmpty()) {
+			center = queue.poll();
+			MapData.DataAny.set(center, FLOODFILLED_KEY, true);
+			for (Map.Edge edge : center.edges) {
+				Map.Center otherCenter = edge.otherCenter(center);
+				if (MapData.DataAny.get(otherCenter, FLOODFILLED_KEY) == null &&
+						MapData.DataIsland.get(otherCenter) == data)
+					queue.offer(otherCenter);
+			}
+		}
+	}
+
+	private boolean isBorderCell(Map map, Map.Center center) {
+		return MapData.DataBorder.get(center) == MapData.DataBorder.BORDER;
 	}
 }
