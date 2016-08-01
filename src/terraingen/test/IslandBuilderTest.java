@@ -27,7 +27,7 @@ public class IslandBuilderTest {
 				Executor.execute((SupplierNode<BufferedImage>) embrace(
 						create(() -> seed),
 						create((IProcessor) new PointsWhiteNoise(new Boundaries(1000,
-								1000), 800)),
+								1000), 3000)),
 						create(new Fortune()),
 						new RepeatClause(50,
 								(Statement<VoronoiBox, VoronoiBox>) embrace(create
