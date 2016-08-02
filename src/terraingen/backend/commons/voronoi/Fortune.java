@@ -339,10 +339,10 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 		public double sweepLine;
 		public TreeSet<Arc> beachLine;
 		public PriorityQueue<Event> eventQueue;
-		public HashSet<BreakPoint> breakPoints;
+		public List<BreakPoint> breakPoints;
 
 		// voronoi map
-		public Map<Point, VoronoiBox.Cell> cells;
+		public List<VoronoiBox.Cell> cells;
 		public List<Point> voronoiPoints;
 		public List<VoronoiBox.Edge> edges;
 
@@ -355,31 +355,56 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 			// initialize data structures
 			this.beachLine = new TreeSet<>();
 			this.eventQueue = new PriorityQueue<>();
-			this.breakPoints = new HashSet<>();
+			this.breakPoints = new ArrayList<>();
 
 			// data for voronoi box
-			this.cells = new HashMap<>();
-			this.voronoiPoints = new Vector<>();
-			this.edges = new Vector<>();
+			this.cells = new ArrayList<>();
+			this.voronoiPoints = new ArrayList<>();
+			this.edges = new ArrayList<>();
 		}
 
 		public void setSweepLine(double sweepLine) {
 			this.sweepLine = sweepLine;
 		}
+	}
 
+	private static class PointWithCell extends Point {
+		protected VoronoiBox.Cell cell;
+
+		public VoronoiBox.Cell getCell() {
+			return this.cell;
+		}
+
+		public void setCell(VoronoiBox.Cell cell) {
+			this.cell = cell;
+		}
+
+		public PointWithCell(double x, double y) {
+			super(x, y);
+		}
+
+		public PointWithCell() {
+		}
+
+		public PointWithCell(Point point) {
+			super(point);
+		}
 	}
 
 	@Override
 	public VoronoiBox process(PointBox input) {
 		Context context = new Context(input);
 
-		preProcess(context);
-
 		List<Point> points = context.points;
 		PriorityQueue<Event> eventQueue = context.eventQueue;
 		// add all site events to queue
-		for (Point point : points)
-			eventQueue.offer(new SiteEvent(point));
+		for (Point point : points) {
+			PointWithCell point2 = new PointWithCell(point);
+			VoronoiBox.Cell cell = new VoronoiBox.Cell(point2);
+			point2.setCell(cell);
+			context.cells.add(cell);
+			eventQueue.offer(new SiteEvent(point2));
+		}
 		// loop
 		while (!eventQueue.isEmpty()) {
 			Event event = eventQueue.poll();
@@ -395,19 +420,6 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 	}
 
 	/**
-	 * Pre-process stage: initialize voronoi map
-	 *
-	 * @param context
-	 * 		Current Context
-	 */
-	protected void preProcess(Context context) {
-		List<Point> points = context.points;
-		// add all cells
-		for (Point point : points)
-			context.cells.put(point, new VoronoiBox.Cell(point));
-	}
-
-	/**
 	 * Post-process stage: construct {@link VoronoiBox}
 	 *
 	 * @param context
@@ -416,9 +428,6 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 	 * @return Constructed {@link VoronoiBox}
 	 */
 	protected VoronoiBox postProcess(Context context) {
-		List<VoronoiBox.Cell> cells = new Vector<>();
-		cells.addAll(context.cells.values());
-
 		for (BreakPoint breakPoint : context.breakPoints) {
 			if (breakPoint.finalPoint == null) {
 				breakPoint.finish();
@@ -426,11 +435,11 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 			}
 		}
 
-		for (VoronoiBox.Cell cell : cells)
+		for (VoronoiBox.Cell cell : context.cells)
 			cell.generatePoints();
 
 		return new VoronoiBox(context.boundaries, context.points, context.edges,
-				cells,
+				context.cells,
 				context.voronoiPoints);
 	}
 
@@ -473,8 +482,8 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 			// set edge
 			Point point1 = breakPoint.getPoint();
 			context.voronoiPoints.add(point1);
-			VoronoiBox.Edge edge = new VoronoiBox.Edge(context.cells.get(first.site),
-					context.cells.get(event.site));
+			VoronoiBox.Edge edge = new VoronoiBox.Edge(((PointWithCell) first.site).cell,
+					((PointWithCell) event.site).cell);
 			edge.setPoint1(point1);
 			breakPoint.setEdge(edge, false);
 			context.edges.add(edge);
@@ -518,8 +527,8 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 		beachLine.add(newRight);
 
 		// set edge
-		VoronoiBox.Edge edge = new VoronoiBox.Edge(context.cells.get(above.site),
-				context.cells.get(event.site));
+		VoronoiBox.Edge edge = new VoronoiBox.Edge(((PointWithCell) above.site).cell,
+				((PointWithCell) event.site).cell);
 		breakL.setEdge(edge, true);
 		breakR.setEdge(edge, false);
 		context.edges.add(edge);
@@ -571,8 +580,9 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 		beachLine.remove(target);
 
 		// set edge
-		VoronoiBox.Edge edge = new VoronoiBox.Edge(context.cells.get(targetL.left.site),
-				context.cells.get(targetR.right.site));
+		VoronoiBox.Edge edge = new VoronoiBox.Edge(
+				((PointWithCell) targetL.left.site).cell,
+				((PointWithCell) targetR.right.site).cell);
 		edge.setPoint1(point1);
 		newBreakPoint.setEdge(edge, false);
 		context.edges.add(edge);

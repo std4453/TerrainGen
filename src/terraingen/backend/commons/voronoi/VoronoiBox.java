@@ -62,20 +62,23 @@ public class VoronoiBox extends PointBox {
 		 * Vertices of the cell, already sorted for use in
 		 * {@linkplain Polygon Polygon}
 		 */
-		public Set<Point> vertices;
+		public List<Point> vertices;
 
 		public Cell(Point site) {
 			this.site = site;
 
 			this.edges = new Vector<>();
-			this.vertices = new TreeSet<>(new PointComparator(site));
+			this.vertices = new ArrayList<>();
 		}
 
 		public void generatePoints() {
+			HashSet<Point> verticesSet = new HashSet<>();
 			for (Edge edge : this.edges) {
-				this.vertices.add(edge.point1);
-				this.vertices.add(edge.point2);
+				verticesSet.add(edge.point1);
+				verticesSet.add(edge.point2);
 			}
+			this.vertices.addAll(verticesSet);
+			this.vertices.sort(new PointComparator(this.site));
 		}
 	}
 

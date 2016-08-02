@@ -7,8 +7,8 @@ import terraingen.utils.MathUtils;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.Collection;
 import java.util.Random;
-import java.util.Set;
 
 import static terraingen.utils.MathUtils.round;
 
@@ -249,7 +249,7 @@ public class VoronoiRenderer implements IProcessor<VoronoiBox, BufferedImage> {
 						color.getBlue() / 2 + 128);
 				g.setColor(color);
 
-				Set<Point> vertices = cell.vertices;
+				Collection<Point> vertices = cell.vertices;
 				int n = vertices.size(), i = 0;
 				int[] xPoints = new int[n], yPoints = new int[n];
 				for (Point p : vertices) {
