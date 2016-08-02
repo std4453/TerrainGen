@@ -44,7 +44,7 @@ public class Lloyd implements IProcessor<VoronoiBox, PointBox> {
 	protected Point calcCentroid(Boundaries boundaries, VoronoiBox.Cell cell) {
 		Collection<VoronoiBox.Edge> edges = cell.edges;
 		Point center = cell.site;
-		Set<Point> points = new TreeSet<>(new VoronoiBox.Cell.PointComparator(center));
+		Set<Point> points = new HashSet<>();
 
 		for (VoronoiBox.Edge edge : edges)
 			intersect(points, boundaries, edge);
