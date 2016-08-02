@@ -22,7 +22,7 @@ import static terraingen.utils.MathUtils.floor;
 import static terraingen.utils.MathUtils.length;
 
 /**
- *
+ * Determines which corners & cells are ocean, land, coast or lake.
  */
 public class IslandBuilder implements IProcessor<Map, Map> {
 	private static final int DEFAULT_WIDTH = 4;
@@ -142,6 +142,17 @@ public class IslandBuilder implements IProcessor<Map, Map> {
 				MapData.DataIsland.set(center, MapData.DataIsland.LAKE);
 			MapData.DataAny.remove(center, FLOODFILLED_KEY);
 		}
+
+		// Finds coastal corners
+		for (Map.Corner corner : input.getCorners())
+			if (MapData.DataIsland.get(corner) == MapData.DataIsland.LAND) {
+				boolean i1 = MapData.DataIsland.get(corner.s1) == MapData.DataIsland.LAND;
+				boolean i2 = MapData.DataIsland.get(corner.s2) == MapData.DataIsland.LAND;
+				boolean i3 = MapData.DataIsland.get(corner.s3) == MapData.DataIsland.LAND;
+				int sum = (i1 ? 1 : 0) + (i2 ? 1 : 0) + (i3 ? 1 : 0);
+				if (sum > 0 && sum < 3)
+					MapData.DataIsland.set(corner, MapData.DataIsland.COAST);
+			}
 
 		return input;
 	}
