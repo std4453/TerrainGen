@@ -200,6 +200,10 @@ public class Map {
 			return this.s1 == center ? this.s2 : this.s2 == center ? this.s1 : null;
 		}
 
+		public Corner otherCorner(Corner corner) {
+			return this.c1 == corner ? this.c2 : this.c2 == corner ? this.c1 : null;
+		}
+
 		public Object getData(String key) {
 			return this.data.get(key);
 		}

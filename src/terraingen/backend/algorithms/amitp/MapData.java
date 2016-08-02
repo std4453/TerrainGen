@@ -26,9 +26,10 @@ public class MapData {
 
 	/**
 	 * Target: Center, Corner<br />
+	 * Note that COAST is only assigned to corners
 	 */
 	public enum DataIsland {
-		OCEAN, LAKE, LAND;
+		OCEAN, LAKE, LAND, COAST;
 
 		public static final String key = "island";
 		public static final DataIsland def = OCEAN;
@@ -49,6 +50,14 @@ public class MapData {
 
 		public static void set(Map.Corner corner, DataIsland dataIsland) {
 			corner.setData(key, dataIsland);
+		}
+
+		public static boolean isWater(DataIsland island) {
+			return island == OCEAN || island == LAKE;
+		}
+
+		public static boolean isLand(DataIsland island) {
+			return island == LAND || island == COAST;
 		}
 	}
 
