@@ -227,25 +227,27 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 			final double x1 = s1.x, x2 = s2.x;
 			final double y1 = s1.y, y2 = s2.y;
 
+			final double y0my1 = y0 - y1,
+					y2my0 = y2 - y0;
+
 			double x, y;
 			if (abs(y1 - y2) < eps) {
 				// when site points of two parabolas have the same y coord then there's
 				// only one intersection point, so it is solved to reduce calculations
 				x = (x1 + x2) / 2;
-				if (abs(y0 - y1) < eps)
+				if (abs(y0my1) < eps)
 					y = Double.NEGATIVE_INFINITY;
 				else
-					y = (y0 + y1) / 2 - square(x1 - x2) / 8 / (y0 - y1);
+					y = (y0 + y1) / 2 - square(x1 - x2) / 8 / y0my1;
 			} else {
 				// math solve of intersection of two parabolas
 				final double a = y1 - y2;
-				final double b = 2 * ((y2 * x1 - y1 * x2) + y0 * (x2 - x1));
-				final double c = (y0 - y1) * (y1 - y2) * (y2 - y0) + (square(
-						x2) * y1 - square(x1) * y2) + y0 * (square(x1) - square(x2));
-				final double delta = square(b) - 4 * a * c;
-				double sqrtDelta = delta < eps ? 0 : Math.sqrt(delta);
-				x = (sqrtDelta - b) / a / 2;
-				y = (y1 + y2) / 2 + (x1 - x2) * (x1 + x2 - 2 * x) / 2 / (y1 - y2);
+				final double bDiv2 = y2my0 * x1 + y0my1 * x2;
+				final double c = (y0my1 * a - square(x1)) * y2my0 - y0my1 * square(x2);
+				final double deltaDiv4 = square(bDiv2) - a * c;
+				double sqrtDeltaDiv2 = deltaDiv4 < eps ? 0 : Math.sqrt(deltaDiv4);
+				x = (sqrtDeltaDiv2 - bDiv2) / a;
+				y = (y1 + y2 + (x1 - x2) * (x1 + x2 - x - x) / a) / 2;
 			}
 
 			this.cachedPoint = new Point(x, y);
@@ -364,6 +366,7 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 		public void setSweepLine(double sweepLine) {
 			this.sweepLine = sweepLine;
 		}
+
 	}
 
 	@Override
@@ -611,8 +614,10 @@ public class Fortune implements IProcessor<PointBox, VoronoiBox> {
 				b = y2 - y1,
 				c = x3 - x2,
 				d = y3 - y2,
-				e = (y2 * y2 - y1 * y1 + x2 * x2 - x1 * x1) / 2,
-				f = (y3 * y3 - y2 * y2 + x3 * x3 - x2 * x2) / 2;
+				sqY2 = square(y2),
+				sqX2 = square(x2),
+				e = (sqY2 - y1 * y1 + sqX2 - x1 * x1) / 2,
+				f = (y3 * y3 - sqY2 + x3 * x3 - sqX2) / 2;
 		final double matD = a * d - c * b;
 		if (Math.abs(matD) < eps)    // equation has no solution
 			return;
