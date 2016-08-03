@@ -6,7 +6,9 @@ import terraingen.backend.commons.PointBox;
 import terraingen.utils.MathUtils;
 
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -67,8 +69,8 @@ public class VoronoiBox extends PointBox {
 		public Cell(Point site) {
 			this.site = site;
 
-			this.edges = new Vector<>();
-			this.vertices = new ArrayList<>();
+			this.edges = new ArrayList<>(8);
+			this.vertices = new ArrayList<>(8);
 		}
 
 		public void generatePoints() {
