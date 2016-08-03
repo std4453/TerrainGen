@@ -143,6 +143,15 @@ public class IslandBuilder implements IProcessor<Map, Map> {
 			MapData.DataAny.remove(center, FLOODFILLED_KEY);
 		}
 
+		// Finds lake corners
+		for (Map.Corner corner : input.getCorners())
+			if (MapData.DataIsland.get(corner) == MapData.DataIsland.OCEAN) {
+				boolean l1 = MapData.DataIsland.get(corner.s1) == MapData.DataIsland.LAKE;
+				boolean l2 = MapData.DataIsland.get(corner.s2) == MapData.DataIsland.LAKE;
+				boolean l3 = MapData.DataIsland.get(corner.s3) == MapData.DataIsland.LAKE;
+				if ((l1 ? 1 : 0) + (l2 ? 1 : 0) + (l3 ? 1 : 0) == 3)
+					MapData.DataIsland.set(corner, MapData.DataIsland.LAKE);
+			}
 		// Finds coastal corners
 		for (Map.Corner corner : input.getCorners())
 			if (MapData.DataIsland.get(corner) == MapData.DataIsland.LAND) {

@@ -59,6 +59,10 @@ public class MapData {
 		public static boolean isLand(DataIsland island) {
 			return island == LAND || island == COAST;
 		}
+
+		public static boolean isOnLand(DataIsland island) {
+			return island != OCEAN;
+		}
 	}
 
 	/**

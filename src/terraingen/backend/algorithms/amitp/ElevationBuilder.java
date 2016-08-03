@@ -35,23 +35,32 @@ public class ElevationBuilder implements IProcessor<Map, Map> {
 
 		while (!queue.isEmpty()) {
 			Map.Corner corner = queue.poll();
+
 			// elevations will be redistributed, so just incrementing here by 1
-			double newElevation = MapData.DataElevation.get(corner) + 1;
+			MapData.DataIsland cornerIsland = MapData.DataIsland.get(corner);
+			double elevation = MapData.DataElevation.get(corner);
 			for (Map.Corner corner2 : new Map.Corner[]{
 					corner.e1.otherCorner(corner),
 					corner.e2.otherCorner(corner),
-					corner.e3.otherCorner(corner),})
-				if (MapData.DataIsland.isLand(MapData.DataIsland.get(corner2)))
-					if (MapData.DataElevation.get(corner2) > newElevation) {
-						MapData.DataElevation.set(corner2, newElevation);
-						queue.offer(corner2);
-					}
+					corner.e3.otherCorner(corner),}) {
+				MapData.DataIsland corner2Island = MapData.DataIsland.get(corner2);
+				double newElevation = elevation + 1;
+				if (corner2Island == MapData.DataIsland.OCEAN)
+					continue;
+				if (cornerIsland == MapData.DataIsland.LAKE ||
+						corner2Island == MapData.DataIsland.LAKE)
+					newElevation = elevation;
+				if (newElevation < MapData.DataElevation.get(corner2)) {
+					MapData.DataElevation.set(corner2, newElevation);
+					queue.offer(corner2);
+				}
+			}
 		}
 
 		// redistribute elevations
 		List<Map.Corner> corners = input.getCorners().stream()
 				.filter((corner) -> MapData
-						.DataIsland.isLand(MapData.DataIsland.get(corner)))
+						.DataIsland.isOnLand(MapData.DataIsland.get(corner)))
 				.sorted((a, b) -> Double.compare(MapData.DataElevation.get(a),
 						MapData.DataElevation.get(b)))
 				.collect(Collectors.toList());
