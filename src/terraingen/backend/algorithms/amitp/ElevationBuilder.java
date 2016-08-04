@@ -2,9 +2,11 @@ package terraingen.backend.algorithms.amitp;
 
 import terraingen.backend.commons.BFSQueue;
 import terraingen.backend.nodegraph.IProcessor;
+import terraingen.utils.Pair;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Determines the elevation of each cell & corner according to the coastline.
@@ -26,73 +28,64 @@ public class ElevationBuilder implements IProcessor<Map, Map> {
 	public Map process(Map input) {
 		BFSQueue<Map.Corner> queue = new BFSQueue<>();
 
-		for (Map.Corner corner : input.getCorners())
-			if (MapData.DataIsland.get(corner) == MapData.DataIsland.COAST) {
-				MapData.DataElevation.set(corner, 0);
-				queue.offer(corner);
-			} else
-				MapData.DataElevation.set(corner, Double.POSITIVE_INFINITY);
+		input.getCorners().parallelStream().forEach(
+				corner -> MapData.DataElevation.set(corner, Double.POSITIVE_INFINITY));
+		input.getCorners().stream()
+				.filter(corner -> MapData.DataIsland.get(corner) ==
+						MapData.DataIsland.COAST)
+				.forEach(corner -> {
+					MapData.DataElevation.set(corner, 0);
+					queue.offer(corner);
+				});
 
 		while (!queue.isEmpty()) {
 			Map.Corner corner = queue.poll();
 
-			// elevations will be redistributed, so just incrementing here by 1
 			MapData.DataIsland cornerIsland = MapData.DataIsland.get(corner);
 			double elevation = MapData.DataElevation.get(corner);
-			for (Map.Corner corner2 : new Map.Corner[]{
-					corner.e1.otherCorner(corner),
+
+			Stream.of(corner.e1.otherCorner(corner),
 					corner.e2.otherCorner(corner),
-					corner.e3.otherCorner(corner),}) {
-				MapData.DataIsland corner2Island = MapData.DataIsland.get(corner2);
-				if (corner2Island == MapData.DataIsland.OCEAN)
-					continue;
-				double newElevation = elevation + 1;
-				if (cornerIsland == MapData.DataIsland.LAKE ||
-						corner2Island == MapData.DataIsland.LAKE)
-					newElevation = elevation;
-				if (newElevation < MapData.DataElevation.get(corner2)) {
-					MapData.DataElevation.set(corner2, newElevation);
-					queue.offer(corner2);
-				}
-			}
+					corner.e3.otherCorner(corner))
+					.filter(corner2 -> MapData.DataIsland.get
+							(corner2) != MapData.DataIsland.OCEAN)
+					.map(corner2 -> new Pair<>(corner2, elevation + (
+							cornerIsland == MapData.DataIsland.LAKE ||
+									MapData.DataIsland.get(corner2) ==
+											MapData.DataIsland.LAKE ? 0 : 1)))
+					.filter(pair -> (pair.b < MapData.DataElevation.get(pair.a)))
+					.forEach(pair -> {
+						MapData.DataElevation.set(pair.a, pair.b);
+						queue.offer(pair.a);
+					});
 		}
 
 		// redistribute elevations
-		List<Map.Corner> corners = input.getCorners().stream()
-				.filter((corner) -> MapData
+		List<Map.Corner> corners = input.getCorners().parallelStream()
+				.filter(corner -> MapData
 						.DataIsland.isOnLand(MapData.DataIsland.get(corner)))
 				.sorted((a, b) -> Double.compare(MapData.DataElevation.get(a),
 						MapData.DataElevation.get(b)))
 				.collect(Collectors.toList());
-		for (int i = 0, size = corners.size(); i < size; ++i) {
-			double newElevation = redistribute(i / (size - 1d));
-			MapData.DataElevation.set(corners.get(i), newElevation);
-		}
+		for (int i = 0, size = corners.size(); i < size; ++i)
+			MapData.DataElevation.set(corners.get(i), redistribute(i / (size - 1d)));
 
 		// calc cell elevation
-		for (Map.Center center : input.getCenters()) {
-			double sum = 0;
-			for (Map.Corner corner : center.corners)
-				sum += MapData.DataElevation.get(corner);
-			MapData.DataElevation.set(center, sum / center.corners.size());
-		}
+		input.getCenters().parallelStream().forEach(center -> MapData.DataElevation.set
+				(center, center.corners.stream().collect(
+						Collectors.averagingDouble(MapData.DataElevation::get))));
 
 		// calculate downslopes
-		for (Map.Corner corner : input.getCorners())
-			if (MapData.DataIsland.get(corner) == MapData.DataIsland.LAND) {
-				double min = Double.POSITIVE_INFINITY;
-				Map.Edge downslope = null;
-				for (Map.Edge edge : new Map.Edge[]{corner.e1, corner.e2, corner.e3,}) {
-					Map.Corner corner2 = edge.otherCorner(corner);
-					double corner2Elevation = MapData.DataElevation.get(corner2);
-					if (corner2Elevation < min) {
-						min = corner2Elevation;
-						downslope = edge;
-					}
-				}
-				if (downslope != null)
-					MapData.DataDownslope.set(corner, downslope);
-			}
+		input.getCorners().parallelStream()
+				.filter(corner -> MapData.DataIsland.get(corner) ==
+						MapData.DataIsland.LAND)
+				.forEach(corner -> MapData.DataDownslope.set(corner,
+						Stream.of(corner.e1, corner.e2, corner.e3)
+								.map(edge -> new Pair<>(edge, MapData.DataElevation.get(
+										edge.otherCorner(corner))))
+								.collect(Collectors.minBy(
+										(p1, p2) -> Double.compare(p1.b, p2.b))
+								).orElse(null).a));
 
 		return input;
 	}
