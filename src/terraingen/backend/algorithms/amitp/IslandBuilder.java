@@ -161,6 +161,8 @@ public class IslandBuilder implements IProcessor<Map, Map> {
 				int sum = (i1 ? 1 : 0) + (i2 ? 1 : 0) + (i3 ? 1 : 0);
 				if (sum > 0 && sum < 3)
 					MapData.DataIsland.set(corner, MapData.DataIsland.COAST);
+				else if (sum == 0)
+					MapData.DataIsland.set(corner, MapData.DataIsland.OCEAN);
 			}
 
 		return input;

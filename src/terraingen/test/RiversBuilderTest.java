@@ -33,6 +33,7 @@ public class RiversBuilderTest {
 						create(Map.mapConverter),
 						create(new IslandBuilder(seed)),
 						create(new ElevationBuilder()),
+						// attempts about one-tenth of the total cell number
 						create(new RiversBuilder(seed, 300)),
 						create(new MapRenderer(MapRenderer.Type.ELEVATION_AND_RIVERS))
 				)));

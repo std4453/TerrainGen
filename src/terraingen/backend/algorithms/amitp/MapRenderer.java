@@ -166,6 +166,7 @@ public class MapRenderer implements IProcessor<Map, BufferedImage> {
 
 	private static class ElevationCellShader implements ICellShader {
 		private static final Color COLOR_OCEAN = new Color(54, 54, 97);
+		private static final Color COLOR_LAKE = new Color(91, 132, 173);
 		private static final Color COLOR_LOWEST = new Color(103, 148, 90);
 		private static final Color COLOR_HIGHEST = new Color(251, 252, 251);
 
@@ -173,6 +174,8 @@ public class MapRenderer implements IProcessor<Map, BufferedImage> {
 		public Color colorizeCell(Map map, Map.Center cell) {
 			if (MapData.DataIsland.get(cell) == MapData.DataIsland.OCEAN)
 				return COLOR_OCEAN;
+			if (MapData.DataIsland.get(cell) == MapData.DataIsland.LAKE)
+				return COLOR_LAKE;
 
 			double elevation = MapData.DataElevation.get(cell);
 			double invElevation = 1 - elevation;
