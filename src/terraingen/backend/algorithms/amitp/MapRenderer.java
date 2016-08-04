@@ -199,6 +199,11 @@ public class MapRenderer implements IProcessor<Map, BufferedImage> {
 
 		@Override
 		public Color colorizeCell(Map map, Map.Center cell) {
+			if (MapData.DataIsland.get(cell) == MapData.DataIsland.OCEAN)
+				return COLOR_OCEAN;
+			if (MapData.DataIsland.get(cell) == MapData.DataIsland.LAKE)
+				return COLOR_LAKE;
+
 			double moisture = MapData.DataMoisture.get(cell);
 			double invMoisture = 1 - moisture;
 			int r1 = COLOR_DRY.getRed(),

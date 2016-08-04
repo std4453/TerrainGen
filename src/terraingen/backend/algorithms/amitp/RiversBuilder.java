@@ -29,8 +29,6 @@ public class RiversBuilder implements IProcessor<Map, Map> {
 			Map.Corner corner = corners.get(index);
 			Map.Edge downslope = MapData.DataDownslope.get(corner);
 			while (downslope != null) {
-				if (MapData.DataIsland.get(corner) == MapData.DataIsland.OCEAN)
-					System.out.println("asasdasdd");
 				MapData.DataRiver.set(downslope, MapData.DataRiver.RIVER);
 				corner = downslope.otherCorner(corner);
 				downslope = MapData.DataDownslope.get(corner);

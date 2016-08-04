@@ -130,7 +130,7 @@ public class MapData {
 	 */
 	public static class DataMoisture {
 		public static final String key = "moisture";
-		public static final double def = 0d;
+		public static final double def = Double.POSITIVE_INFINITY;
 
 		public static double get(Map.Center center) {
 			Double moisture = (Double) center.getData(key);
