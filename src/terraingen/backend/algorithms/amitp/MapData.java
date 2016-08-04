@@ -92,6 +92,20 @@ public class MapData {
 		}
 	}
 
+	public static class DataDownslope {
+		public static final String key = "downslope";
+		public static final Map.Edge def = null;
+
+		public static Map.Edge get(Map.Corner corner) {
+			Map.Edge downslope = (Map.Edge) corner.getData(key);
+			return downslope == null ? def : downslope;
+		}
+
+		public static void set(Map.Corner corner, Map.Edge downslope) {
+			corner.setData(key, downslope);
+		}
+	}
+
 	/**
 	 * Target: Edge<br />
 	 */

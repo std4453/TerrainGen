@@ -44,9 +44,9 @@ public class ElevationBuilder implements IProcessor<Map, Map> {
 					corner.e2.otherCorner(corner),
 					corner.e3.otherCorner(corner),}) {
 				MapData.DataIsland corner2Island = MapData.DataIsland.get(corner2);
-				double newElevation = elevation + 1;
 				if (corner2Island == MapData.DataIsland.OCEAN)
 					continue;
+				double newElevation = elevation + 1;
 				if (cornerIsland == MapData.DataIsland.LAKE ||
 						corner2Island == MapData.DataIsland.LAKE)
 					newElevation = elevation;
@@ -76,6 +76,23 @@ public class ElevationBuilder implements IProcessor<Map, Map> {
 				sum += MapData.DataElevation.get(corner);
 			MapData.DataElevation.set(center, sum / center.corners.size());
 		}
+
+		// calculate downslopes
+		for (Map.Corner corner : input.getCorners())
+			if (MapData.DataIsland.get(corner) == MapData.DataIsland.LAND) {
+				double min = Double.POSITIVE_INFINITY;
+				Map.Edge downslope = null;
+				for (Map.Edge edge : new Map.Edge[]{corner.e1, corner.e2, corner.e3,}) {
+					Map.Corner corner2 = edge.otherCorner(corner);
+					double corner2Elevation = MapData.DataElevation.get(corner2);
+					if (corner2Elevation < min) {
+						min = corner2Elevation;
+						downslope = edge;
+					}
+				}
+				if (downslope != null)
+					MapData.DataDownslope.set(corner, downslope);
+			}
 
 		return input;
 	}

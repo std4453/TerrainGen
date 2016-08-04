@@ -57,6 +57,24 @@ public class MapRenderer implements IProcessor<Map, BufferedImage> {
 			public void execute(Map map, BufferedImage image) {
 				renderToImageBiomes(map, image);
 			}
+		}, ELEVATION_AND_RIVERS {
+			@Override
+			public void execute(Map map, BufferedImage image) {
+				renderToImageElevation(map, image);
+				renderToImageRivers(map, image);
+			}
+		}, MOISTURE_AND_RIVERS {
+			@Override
+			public void execute(Map map, BufferedImage image) {
+				renderToImageMoisture(map, image);
+				renderToImageRivers(map, image);
+			}
+		}, BIOMES_AND_RIVERS {
+			@Override
+			public void execute(Map map, BufferedImage image) {
+				renderToImageBiomes(map, image);
+				renderToImageRivers(map, image);
+			}
 		};
 
 		public abstract void execute(Map map, BufferedImage image);
@@ -275,8 +293,8 @@ public class MapRenderer implements IProcessor<Map, BufferedImage> {
 	}
 
 	private static class RiversEdgeShader implements IEdgeShader {
-		private static final Color COLOR_RIVER = Color.BLUE;
-		private static final Color COLOR_NON_RIVER = Color.BLACK;
+		private static final Color COLOR_RIVER = new Color(34, 85, 136);
+		private static final Color COLOR_NON_RIVER = new Color(0, 0, 0);
 		private static final float EDGE_WIDTH_RIVER = 3;
 		private static final float EDGE_WIDTH_NON_RIVER = 1;
 
