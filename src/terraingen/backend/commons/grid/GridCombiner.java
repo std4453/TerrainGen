@@ -6,6 +6,7 @@ import terraingen.backend.nodegraph.IMultiCombiner;
 import terraingen.utils.Twin;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Adds values of a list of {@link Grid}{@code s} together, with the result's size the
@@ -37,17 +38,9 @@ public class GridCombiner implements IMultiCombiner<Grid, Grid> {
 			return new Twin<>(0, 0);
 		}
 
-		int minWidth = Integer.MAX_VALUE, minHeight = Integer.MAX_VALUE;
-		for (Grid grid : grids) {
-			if (grid == null)
-				continue;
-			int width = grid.getWidth(), height = grid.getHeight();
-			if (width < minWidth)
-				minWidth = width;
-			if (height < minHeight)
-				minHeight = height;
-		}
-
-		return new Twin<>(minWidth, minHeight);
+		return new Twin<>(grids.parallelStream().map(Grid::getWidth)
+				.collect(Collectors.minBy(Integer::compare)).orElse(0),
+				grids.parallelStream().map(Grid::getHeight)
+						.collect(Collectors.minBy(Integer::compare)).orElse(0));
 	}
 }
