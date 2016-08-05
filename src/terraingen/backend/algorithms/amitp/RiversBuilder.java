@@ -4,6 +4,7 @@ import terraingen.backend.nodegraph.IProcessor;
 
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Stream;
 
 /**
  *
@@ -24,16 +25,16 @@ public class RiversBuilder implements IProcessor<Map, Map> {
 		List<Map.Corner> corners = input.getCorners();
 		int size = corners.size();
 
-		for (int i = 0; i < this.attempts; ++i) {
-			int index = random.nextInt(size);
-			Map.Corner corner = corners.get(index);
-			Map.Edge downslope = MapData.DataDownslope.get(corner);
-			while (downslope != null) {
-				MapData.DataRiver.set(downslope, MapData.DataRiver.RIVER);
-				corner = downslope.otherCorner(corner);
-				downslope = MapData.DataDownslope.get(corner);
-			}
-		}
+		Stream.generate(() -> random.nextInt(size)).limit(this.attempts).map(corners::get)
+				.forEach(corner -> {
+					Map.Edge downslope = MapData.DataDownslope.get(corner);
+					while (downslope != null &&
+							MapData.DataRiver.get(downslope) != MapData.DataRiver.RIVER) {
+						MapData.DataRiver.set(downslope, MapData.DataRiver.RIVER);
+						corner = downslope.otherCorner(corner);
+						downslope = MapData.DataDownslope.get(corner);
+					}
+				});
 
 		return input;
 	}
