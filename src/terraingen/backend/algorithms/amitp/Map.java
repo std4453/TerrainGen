@@ -219,7 +219,7 @@ public class Map {
 
 	protected Boundaries boundaries;
 
-	protected List<Center> centers;
+	protected final List<Center> centers;
 	protected List<Corner> corners;
 	protected List<Edge> edges;
 
@@ -241,11 +241,15 @@ public class Map {
 		java.util.Map<Point, List<Edge>> corner2edge = new HashMap<>();
 
 		// add all cells
-		for (VoronoiBox.Cell cell : voronoiBox.getCells()) {
+		voronoiBox.getCells().parallelStream().forEach(cell -> {
 			Center center = new Center(cell.site);
-			this.centers.add(center);
-			cell2center.put(cell, center);
-		}
+			synchronized (this.centers) {
+				this.centers.add(center);
+			}
+			synchronized (cell2center) {
+				cell2center.put(cell, center);
+			}
+		});
 
 		// add edges
 		for (VoronoiBox.Edge edge : voronoiBox.getEdges()) {
