@@ -45,12 +45,12 @@ public class MoistureBuilder implements IProcessor<Map, Map> {
 					});
 		}
 
-		input.getCenters().forEach(center -> MapData.DataMoisture.set(center,
-				center.corners.parallelStream().collect(Collectors.averagingDouble(
-						MapData.DataMoisture::get))));
+		input.getCenters().parallelStream().forEach(center -> MapData.DataMoisture.set
+				(center, center.corners.parallelStream().collect(
+						Collectors.averagingDouble(MapData.DataMoisture::get))));
 
 		// redistribute moisture
-		List<Map.Center> centers = input.getCenters().stream()
+		List<Map.Center> centers = input.getCenters().parallelStream()
 				.filter((center) -> MapData.DataIsland.isLand(
 						MapData.DataIsland.get(center)))
 				.sorted((a, b) -> Double.compare(MapData.DataMoisture.get(a),

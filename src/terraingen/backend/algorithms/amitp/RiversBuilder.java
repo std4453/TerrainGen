@@ -26,15 +26,15 @@ public class RiversBuilder implements IProcessor<Map, Map> {
 		int size = corners.size();
 
 		Stream.generate(() -> random.nextInt(size)).limit(this.attempts).map(corners::get)
-				.forEach(corner -> {
-					Map.Edge downslope = MapData.DataDownslope.get(corner);
-					while (downslope != null &&
-							MapData.DataRiver.get(downslope) != MapData.DataRiver.RIVER) {
-						MapData.DataRiver.set(downslope, MapData.DataRiver.RIVER);
-						corner = downslope.otherCorner(corner);
-						downslope = MapData.DataDownslope.get(corner);
-					}
-				});
+				.parallel().forEach(corner -> {
+			Map.Edge downslope = MapData.DataDownslope.get(corner);
+			while (downslope != null &&
+					MapData.DataRiver.get(downslope) != MapData.DataRiver.RIVER) {
+				MapData.DataRiver.set(downslope, MapData.DataRiver.RIVER);
+				corner = downslope.otherCorner(corner);
+				downslope = MapData.DataDownslope.get(corner);
+			}
+		});
 
 		return input;
 	}
