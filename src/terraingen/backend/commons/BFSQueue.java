@@ -31,9 +31,8 @@ public class BFSQueue<E> implements Iterable<E>, Queue<E> {
 
 		@Override
 		public boolean hasNext() {
-			if (BFSQueue.this.modCount != this.expectedModCount)
-				return false;
-			return this.cursor != this.end;
+			return BFSQueue.this.modCount == this.expectedModCount &&
+					this.cursor != this.end;
 		}
 
 		@SuppressWarnings("unchecked")
@@ -166,8 +165,11 @@ public class BFSQueue<E> implements Iterable<E>, Queue<E> {
 		this.tail = 0;
 	}
 
+	/**
+	 * Set to synchronized to be used in parallel streams.
+	 */
 	@Override
-	public boolean offer(E e) {
+	public synchronized boolean offer(E e) {
 		if (e == null)
 			return false;
 

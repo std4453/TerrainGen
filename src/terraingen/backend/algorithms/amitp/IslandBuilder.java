@@ -106,21 +106,23 @@ public class IslandBuilder implements IProcessor<Map, Map> {
 	@Override
 	public Map process(Map input) {
 		Boundaries mapBoundaries = input.getBoundaries();
-		for (Map.Corner corner : input.getCorners()) {
-			MapData.DataIsland island = MapData.DataIsland.OCEAN;
-			if (mapBoundaries.inBoundaries(corner.point)) {
-				Point gridPoint = MathUtils.transform(mapBoundaries, corner.point,
-						this.boundaries);
-				double value = this.noise.get(floor(gridPoint.x), floor(gridPoint.y));
-				Point normPoint = MathUtils.transform(mapBoundaries, corner.point,
-						normBoundaries);
-				island = value > probability(length(normPoint)) ?
-						MapData.DataIsland.LAND : MapData.DataIsland.OCEAN;
-			}
-			MapData.DataIsland.set(corner, island);
-		}
 
-		for (Map.Center center : input.getCenters()) {
+		input.getCorners().parallelStream().forEach(corner ->
+				MapData.DataIsland.set(corner, MapData.DataIsland.OCEAN));
+		input.getCorners().parallelStream()
+				.filter(corner -> mapBoundaries.inBoundaries(corner.point))
+				.forEach(corner -> {
+					Point gridPoint = MathUtils.transform(mapBoundaries, corner.point,
+							this.boundaries);
+					double value = this.noise.get(floor(gridPoint.x), floor(gridPoint.y));
+					Point normPoint = MathUtils.transform(mapBoundaries, corner.point,
+							normBoundaries);
+					MapData.DataIsland.set(corner,
+							value > probability(length(normPoint)) ?
+									MapData.DataIsland.LAND : MapData.DataIsland.OCEAN);
+				});
+
+		input.getCenters().parallelStream().forEach(center -> {
 			MapData.DataIsland island = MapData.DataIsland.LAND;
 			for (Map.Corner corner : center.corners)
 				if (MapData.DataIsland.get(corner) == MapData.DataIsland.OCEAN) {
@@ -128,42 +130,44 @@ public class IslandBuilder implements IProcessor<Map, Map> {
 					break;
 				}
 			MapData.DataIsland.set(center, island);
-		}
+		});
 
 		// IslandBuilder calculates whether a cell is a lake cell by means that:
 		// 1. Floodfill every border cell so that the the OCEAN region is determined.
 		// 2. Search for any not floodfill-ed OCEAN cell and set it to be LAKE.
-		for (Map.Center center : input.getCenters())
-			if (isBorderCell(input, center))
-				floodfill(input, center);
-		for (Map.Center center : input.getCenters()) {
-			if (MapData.DataIsland.get(center) == MapData.DataIsland.OCEAN &&
-					MapData.DataAny.get(center, FLOODFILLED_KEY) == null)
-				MapData.DataIsland.set(center, MapData.DataIsland.LAKE);
-			MapData.DataAny.remove(center, FLOODFILLED_KEY);
-		}
+		input.getCenters().parallelStream().filter(center ->
+				MapData.DataBorder.get(center) == MapData.DataBorder.BORDER)
+				.forEach(center -> floodfill(input, center));
+		input.getCenters().parallelStream().filter(center ->
+				MapData.DataIsland.get(center) == MapData.DataIsland.OCEAN &&
+						MapData.DataAny.get(center, FLOODFILLED_KEY) == null)
+				.forEach(center -> MapData.DataIsland.set(center,
+						MapData.DataIsland.LAKE));
+		input.getCenters().parallelStream().forEach(center ->
+				MapData.DataAny.remove(center, FLOODFILLED_KEY));
 
-		// Finds lake corners
-		for (Map.Corner corner : input.getCorners())
-			if (MapData.DataIsland.get(corner) == MapData.DataIsland.OCEAN) {
-				boolean l1 = MapData.DataIsland.get(corner.s1) == MapData.DataIsland.LAKE;
-				boolean l2 = MapData.DataIsland.get(corner.s2) == MapData.DataIsland.LAKE;
-				boolean l3 = MapData.DataIsland.get(corner.s3) == MapData.DataIsland.LAKE;
-				if ((l1 ? 1 : 0) + (l2 ? 1 : 0) + (l3 ? 1 : 0) == 3)
-					MapData.DataIsland.set(corner, MapData.DataIsland.LAKE);
-			}
-		// Finds coastal corners
-		for (Map.Corner corner : input.getCorners())
-			if (MapData.DataIsland.get(corner) == MapData.DataIsland.LAND) {
-				boolean i1 = MapData.DataIsland.get(corner.s1) == MapData.DataIsland.LAND;
-				boolean i2 = MapData.DataIsland.get(corner.s2) == MapData.DataIsland.LAND;
-				boolean i3 = MapData.DataIsland.get(corner.s3) == MapData.DataIsland.LAND;
-				int sum = (i1 ? 1 : 0) + (i2 ? 1 : 0) + (i3 ? 1 : 0);
-				if (sum > 0 && sum < 3)
-					MapData.DataIsland.set(corner, MapData.DataIsland.COAST);
-				else if (sum == 0)
-					MapData.DataIsland.set(corner, MapData.DataIsland.OCEAN);
-			}
+		// find lake corners
+		input.getCorners().parallelStream()
+				.filter(corner -> MapData.DataIsland.get(corner) ==
+						MapData.DataIsland.OCEAN)
+				.filter(corner -> MapData.DataIsland.get(corner.s1) ==
+						MapData.DataIsland.LAKE &&
+						MapData.DataIsland.get(corner.s2) == MapData.DataIsland.LAKE &&
+						MapData.DataIsland.get(corner.s3) == MapData.DataIsland.LAKE)
+				.forEach(corner -> MapData.DataIsland.set(corner,
+						MapData.DataIsland.LAKE));
+
+		// find coastal corners
+		input.getCorners().parallelStream().forEach(corner -> {
+			boolean i1 = MapData.DataIsland.get(corner.s1) == MapData.DataIsland.LAND;
+			boolean i2 = MapData.DataIsland.get(corner.s2) == MapData.DataIsland.LAND;
+			boolean i3 = MapData.DataIsland.get(corner.s3) == MapData.DataIsland.LAND;
+			int sum = (i1 ? 1 : 0) + (i2 ? 1 : 0) + (i3 ? 1 : 0);
+			if (sum > 0 && sum < 3)
+				MapData.DataIsland.set(corner, MapData.DataIsland.COAST);
+			else if (sum == 0)
+				MapData.DataIsland.set(corner, MapData.DataIsland.OCEAN);
+		});
 
 		return input;
 	}
@@ -171,26 +175,21 @@ public class IslandBuilder implements IProcessor<Map, Map> {
 	// temporary keys used in floodfilling
 	private static final String FLOODFILLED_KEY = "floodfilled";
 
-	private void floodfill(Map map, Map.Center center) {
-		// Floodfill uses BFS to a stack overflow ( in case number of cells may become
-		// very big )
+	private void floodfill(Map map, Map.Center cell) {
+		// Floodfill uses BFS to avoid stack overflow
+		// ( in case number of cells may become very big )
 		BFSQueue<Map.Center> queue = new BFSQueue<>();
-		if (MapData.DataAny.get(center, FLOODFILLED_KEY) == null)
-			queue.offer(center);
-		MapData.DataIsland data = MapData.DataIsland.get(center);
+		if (MapData.DataAny.get(cell, FLOODFILLED_KEY) == null)
+			queue.offer(cell);
+		MapData.DataIsland data = MapData.DataIsland.get(cell);
 		while (!queue.isEmpty()) {
-			center = queue.poll();
+			final Map.Center center = queue.poll();
 			MapData.DataAny.set(center, FLOODFILLED_KEY, true);
-			for (Map.Edge edge : center.edges) {
-				Map.Center otherCenter = edge.otherCenter(center);
-				if (MapData.DataAny.get(otherCenter, FLOODFILLED_KEY) == null &&
-						MapData.DataIsland.get(otherCenter) == data)
-					queue.offer(otherCenter);
-			}
+			center.edges.parallelStream()
+					.map(edge -> edge.otherCenter(center))
+					.filter(center2 -> MapData.DataIsland.get(center2) == data &&
+							MapData.DataAny.get(center2, FLOODFILLED_KEY) == null)
+					.forEach(queue::offer);
 		}
-	}
-
-	private boolean isBorderCell(Map map, Map.Center center) {
-		return MapData.DataBorder.get(center) == MapData.DataBorder.BORDER;
 	}
 }

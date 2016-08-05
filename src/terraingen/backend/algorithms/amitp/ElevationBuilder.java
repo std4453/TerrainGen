@@ -30,7 +30,7 @@ public class ElevationBuilder implements IProcessor<Map, Map> {
 
 		input.getCorners().parallelStream().forEach(
 				corner -> MapData.DataElevation.set(corner, Double.POSITIVE_INFINITY));
-		input.getCorners().stream()
+		input.getCorners().parallelStream()
 				.filter(corner -> MapData.DataIsland.get(corner) ==
 						MapData.DataIsland.COAST)
 				.forEach(corner -> {
