@@ -72,7 +72,7 @@ public class ElevationBuilder implements IProcessor<Map, Map> {
 
 		// calc cell elevation
 		input.getCenters().parallelStream().forEach(center -> MapData.DataElevation.set
-				(center, center.corners.stream().collect(
+				(center, center.corners.parallelStream().collect(
 						Collectors.averagingDouble(MapData.DataElevation::get))));
 
 		// calculate downslopes

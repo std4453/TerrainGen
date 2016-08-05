@@ -5,6 +5,7 @@ import terraingen.backend.nodegraph.IProcessor;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  *
@@ -14,42 +15,39 @@ public class MoistureBuilder implements IProcessor<Map, Map> {
 	public Map process(Map input) {
 		BFSQueue<Map.Corner> queue = new BFSQueue<>();
 
-		for (Map.Corner corner : input.getCorners()) {
+		input.getCorners().parallelStream().forEach(corner -> {
+			MapData.DataIsland island = MapData.DataIsland.get(corner);
+			if (island == MapData.DataIsland.OCEAN || island == MapData.DataIsland.LAKE)
+				MapData.DataMoisture.set(corner, 0);
+		});
+		input.getCorners().parallelStream().forEach(corner -> {
 			// river bank / coast ( lake & ocean aren't included for performance )
 			MapData.DataIsland island = MapData.DataIsland.get(corner);
 			Map.Edge downslope = MapData.DataDownslope.get(corner);
 			boolean isRiver = downslope != null &&
 					MapData.DataRiver.get(downslope) == MapData.DataRiver.RIVER;
-			if (island == MapData.DataIsland.OCEAN ||
-					island == MapData.DataIsland.LAKE ||
-					island == MapData.DataIsland.COAST ||
-					isRiver)
+			if (island == MapData.DataIsland.COAST || isRiver) {
 				MapData.DataMoisture.set(corner, 0);
-			if (island == MapData.DataIsland.COAST || isRiver)
 				queue.offer(corner);
-		}
+			}
+		});
 
 		while (!queue.isEmpty()) {
 			Map.Corner corner = queue.poll();
-			double moisture = MapData.DataMoisture.get(corner);
-			double newMoisture = moisture + 1;
-			for (Map.Corner corner2 : new Map.Corner[]{
-					corner.e1.otherCorner(corner),
+			double newMoisture = MapData.DataMoisture.get(corner) + 1;
+			Stream.of(corner.e1.otherCorner(corner),
 					corner.e2.otherCorner(corner),
-					corner.e3.otherCorner(corner)}) {
-				if (MapData.DataMoisture.get(corner2) > newMoisture) {
-					MapData.DataMoisture.set(corner2, newMoisture);
-					queue.offer(corner2);
-				}
-			}
+					corner.e3.otherCorner(corner))
+					.filter(corner2 -> MapData.DataMoisture.get(corner2) > newMoisture)
+					.forEach(corner2 -> {
+						MapData.DataMoisture.set(corner2, newMoisture);
+						queue.offer(corner2);
+					});
 		}
 
-		for (Map.Center center : input.getCenters()) {
-			double s = 0;
-			for (Map.Corner corner : center.corners)
-				s += MapData.DataMoisture.get(corner);
-			MapData.DataMoisture.set(center, s / center.corners.size());
-		}
+		input.getCenters().forEach(center -> MapData.DataMoisture.set(center,
+				center.corners.parallelStream().collect(Collectors.averagingDouble(
+						MapData.DataMoisture::get))));
 
 		// redistribute moisture
 		List<Map.Center> centers = input.getCenters().stream()
@@ -58,10 +56,8 @@ public class MoistureBuilder implements IProcessor<Map, Map> {
 				.sorted((a, b) -> Double.compare(MapData.DataMoisture.get(a),
 						MapData.DataMoisture.get(b)))
 				.collect(Collectors.toList());
-		for (int i = 0, size = centers.size(); i < size; ++i) {
-			double newMoisture = redistribute(i / (size - 1d));
-			MapData.DataMoisture.set(centers.get(i), newMoisture);
-		}
+		for (int i = 0, size = centers.size(); i < size; ++i)
+			MapData.DataMoisture.set(centers.get(i), redistribute(i / (size - 1d)));
 
 		return input;
 	}
