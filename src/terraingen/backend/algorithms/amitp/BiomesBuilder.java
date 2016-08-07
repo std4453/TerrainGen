@@ -19,6 +19,8 @@ public class BiomesBuilder implements IProcessor<Map, Map> {
 		double elevation = MapData.DataElevation.get(cell);
 		double moisture = MapData.DataMoisture.get(cell);
 
+		// copied directly from amitp's code
+
 		if (island == MapData.DataIsland.OCEAN) {
 			return MapData.DataBiome.OCEAN;
 		} else if (island == MapData.DataIsland.LAKE) {
@@ -50,6 +52,11 @@ public class BiomesBuilder implements IProcessor<Map, Map> {
 	}
 
 	protected boolean isCellCoast(Map.Center cell) {
+		for (Map.Edge edge : cell.edges)
+			if (edge.otherCenter(cell) != null &&
+					MapData.DataIsland.get(
+							edge.otherCenter(cell)) == MapData.DataIsland.LAKE)
+				return false;
 		for (Map.Corner corner : cell.corners)
 			if (MapData.DataIsland.get(corner) == MapData.DataIsland.COAST)
 				return true;

@@ -296,16 +296,14 @@ public class MapRenderer implements IProcessor<Map, BufferedImage> {
 
 		@Override
 		public float getEdgeWidth(Map map, Map.Edge edge) {
-			return 1;
+			return .3f;
 		}
 	}
 
-	private static class RiversEdgeShader implements IEdgeShader {
+	private static class RiversEdgeShader extends VanillaEdgeShader {
 		private static final Color COLOR_RIVER = new Color(34, 85, 136);
-		private static final Color COLOR_NON_RIVER = new Color(0, 0, 0);
 
 		private static final float EDGE_WIDTH_RIVER = 3;
-		private static final float EDGE_WIDTH_NON_RIVER = 1;
 
 		@Override
 
@@ -313,10 +311,8 @@ public class MapRenderer implements IProcessor<Map, BufferedImage> {
 			switch (MapData.DataRiver.get(edge)) {
 				case RIVER:
 					return COLOR_RIVER;
-				case NON_RIVER:
-					return COLOR_NON_RIVER;
 			}
-			return null;    // should not happen
+			return super.colorizeEdge(map, edge);
 		}
 
 		@Override
@@ -324,10 +320,8 @@ public class MapRenderer implements IProcessor<Map, BufferedImage> {
 			switch (MapData.DataRiver.get(edge)) {
 				case RIVER:
 					return EDGE_WIDTH_RIVER;
-				case NON_RIVER:
-					return EDGE_WIDTH_NON_RIVER;
 			}
-			return 0f;    // should not happen
+			return super.getEdgeWidth(map, edge);
 		}
 	}
 
