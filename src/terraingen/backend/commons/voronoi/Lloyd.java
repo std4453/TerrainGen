@@ -21,8 +21,8 @@ public class Lloyd implements IProcessor<VoronoiBox, PointBox> {
 		Boundaries boundaries = input.getBoundaries();
 		List<Point> points = new Vector<>();
 
-		for (VoronoiBox.Cell cell : input.getCells())
-			points.add(calcCentroid(boundaries, cell));
+		input.getCells().parallelStream().map(cell -> calcCentroid(boundaries, cell))
+				.forEach(points::add);
 		return new PointBox(boundaries, points);
 	}
 
@@ -48,7 +48,6 @@ public class Lloyd implements IProcessor<VoronoiBox, PointBox> {
 
 		for (VoronoiBox.Edge edge : edges)
 			intersect(points, boundaries, edge);
-		// FIXME: should add corner points to cells that contain them
 
 		double x = 0, y = 0;
 		for (Point point : points) {
