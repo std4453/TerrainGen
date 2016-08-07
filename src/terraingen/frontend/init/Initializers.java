@@ -1,16 +1,17 @@
 package terraingen.frontend.init;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Loaded Initializers:<br />
  * <table>
  * <tr><td>Name</td><td>Class</td><td>Description</td></tr>
- * <tr><td>ui</td><td>{@link terraingen.frontend.init.InitUI InitUI}</td><td>User interface module</td></tr>
+ * <tr><td>ui</td><td>{@link terraingen.frontend.init.InitUI InitUI}</td>
+ * <td>User interface module</td></tr>
  * </table>
  */
 public class Initializers {
