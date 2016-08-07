@@ -13,6 +13,12 @@ public class GridTo01Mapper extends GridMapper {
 		super(null);
 	}
 
+	/**
+	 * While multithreaded, this method, which override the instance field
+	 * {@link #mapper}, will result in the wrong answer. Therefore, in any ( probably )
+	 * parallel environment, an instance of {@code GridTo01Mapper} should not be reused.
+	 * That is, an new instance of {@code GridTo01Mapper} should be created per usage.
+	 */
 	@SuppressWarnings("unchecked")
 	@Override
 	public Grid process(Grid input) {
