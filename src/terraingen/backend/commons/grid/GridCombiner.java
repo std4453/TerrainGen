@@ -7,6 +7,7 @@ import terraingen.utils.Twin;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Adds values of a list of {@link Grid}{@code s} together, with the result's size the
@@ -25,19 +26,14 @@ public class GridCombiner implements IMultiCombiner<Grid, Grid> {
 			data[i] = new double[height];
 
 		for (Grid grid : inputs)
-			for (int i = 0; i < width; ++i)
-				for (int j = 0; j < height; ++j)
-					data[i][j] += grid.get(i, j);
+			Stream.iterate(0, n -> n + 1).limit(width * height).parallel()
+					.forEach(n -> data[n / height][n % height] +=
+							grid.get(n / height, n % height));
 
 		return new Grid(data);
 	}
 
 	protected Twin<Integer> minimumSize(List<Grid> grids) {
-		if (grids.isEmpty()) {
-			log.warn("Should have at least one grid input.");
-			return new Twin<>(0, 0);
-		}
-
 		return new Twin<>(grids.parallelStream().map(Grid::getWidth)
 				.collect(Collectors.minBy(Integer::compare)).orElse(0),
 				grids.parallelStream().map(Grid::getHeight)
