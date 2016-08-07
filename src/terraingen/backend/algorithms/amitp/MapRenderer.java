@@ -303,6 +303,7 @@ public class MapRenderer implements IProcessor<Map, BufferedImage> {
 	private static class RiversEdgeShader implements IEdgeShader {
 		private static final Color COLOR_RIVER = new Color(34, 85, 136);
 		private static final Color COLOR_NON_RIVER = new Color(0, 0, 0);
+
 		private static final float EDGE_WIDTH_RIVER = 3;
 		private static final float EDGE_WIDTH_NON_RIVER = 1;
 
