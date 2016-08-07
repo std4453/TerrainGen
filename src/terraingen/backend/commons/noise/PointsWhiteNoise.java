@@ -4,7 +4,6 @@ import terraingen.backend.commons.Boundaries;
 import terraingen.backend.commons.Point;
 import terraingen.backend.commons.PointBox;
 import terraingen.backend.nodegraph.IProcessor;
-import terraingen.backend.nodegraph.ISupplier;
 
 import java.util.List;
 import java.util.Random;
@@ -14,8 +13,7 @@ import java.util.stream.Stream;
 /**
  * Generates a {@link PointBox} with completely random points, i.e., white noise.
  */
-public class PointsWhiteNoise implements IProcessor<Long, PointBox>,
-		ISupplier<PointBox> {
+public class PointsWhiteNoise implements IProcessor<Long, PointBox> {
 	protected Boundaries boundaries;
 	protected int pointCount;
 
@@ -38,10 +36,5 @@ public class PointsWhiteNoise implements IProcessor<Long, PointBox>,
 				}).collect(Collectors.toList());
 
 		return new PointBox(this.boundaries, points);
-	}
-
-	@Override
-	public PointBox supply() {
-		return this.process(System.currentTimeMillis());
 	}
 }
